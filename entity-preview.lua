@@ -141,7 +141,7 @@ CreateThread(function (threadId)
             for index, Point in ipairs(pointsInRange) do
                     --remove entity
                     local Line = PropLines[Point.parentId]
-                    ReturnEntityToPool(Line.prop, Point.previewEntityId)
+                    ReturnEntityToPool(Line.propName, Point.previewEntityId)
                     Point.previewEntityId = 0
             end
             pointsInRange = {}
@@ -157,7 +157,7 @@ CreateThread(function (threadId)
                         if Point.previewEntityId == 0 then
                             local batchIndex = #pointsInRange+1
                             --add entity
-                            Point.previewEntityId = takeEntityFromPool(Line.prop)
+                            Point.previewEntityId = takeEntityFromPool(Line.propName)
                             -- print("Preview Id set to", Point.previewEntityId)
                             SetPointsPropPositionAndQuat(Point)
                             
@@ -170,8 +170,8 @@ CreateThread(function (threadId)
                     else
                         if Point.previewEntityId ~= 0 then
                             --remove entity
-                            -- print(Line.prop, Point.previewEntityId)
-                            ReturnEntityToPool(Line.prop, Point.previewEntityId)
+                            -- print(Line.propName, Point.previewEntityId)
+                            ReturnEntityToPool(Line.propName, Point.previewEntityId)
                             Point.previewEntityId = 0
                         end
                     end

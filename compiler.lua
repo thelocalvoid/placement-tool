@@ -257,8 +257,8 @@ local function sortPointsIntoGrids(propLineData, ymapNamePrefix)
     for lineIndex, lineData in pairs(propLineData) do
 
         local propData = lineData.propData
-        if not propDataCache[lineData.prop] then
-            propDataCache[lineData.prop] = addEntityToDataCache(lineData.prop)
+        if not propDataCache[lineData.propName] then
+            propDataCache[lineData.propName] = addEntityToDataCache(lineData.propName)
         end
 
         local gridData
@@ -282,12 +282,12 @@ local function sortPointsIntoGrids(propLineData, ymapNamePrefix)
             gridData = grids[gridNumber]
             gridData.entityData[#gridData.entityData+1] = {
                 compilerId = counter,
-                archetypeName = lineData.prop,
+                archetypeName = lineData.propName,
                 flags = 1572873,
-                lodDist = propDataCache[lineData.prop].lodDist,
+                lodDist = propDataCache[lineData.propName].lodDist,
                 pos = propPosition,
                 quat = propQuaternion, --!TEMP PLACEHOLDER
-                maxRadius = propDataCache[lineData.prop].maxRadius,
+                maxRadius = propDataCache[lineData.propName].maxRadius,
             }
 
 

@@ -592,9 +592,8 @@ local toolStateControls = {
 
                 local point = PropLines[CurrentlySelectedPropLine].points[EditSelection]
                 local dir = cm_Dir_vec3(point.PosAndRotData.pointPosition, CursorWorldPos)
-                local newDir = cm_Norm_vec3(vector3(dir.x, dir.y, 0.0))
 
-                SetPointRotationOverride(CurrentlySelectedPropLine, EditSelection, newDir)
+                SetPointRotationOverride(CurrentlySelectedPropLine, EditSelection, dir)
                 -- print("MOVED POINT:",EditSelection)
                 if IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.LMB) then
                     EditSelection = -1

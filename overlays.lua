@@ -88,7 +88,7 @@ local function drawLines()
         end
 
         -- ! EXPERIMENTAL
-        -- * This 3d nature of the lines, displaying  them directly infront of the camera
+        -- * This removes the 3d nature of the lines, displaying  them directly infront of the camera
         -- # SEEMS TO WORK PRETTY WELL
         local startDiff = entry.lineStart - ClientCamCoords
         local endDiff = entry.lineEnd - ClientCamCoords

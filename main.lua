@@ -182,6 +182,7 @@ CreateThread(function (threadId)
                 if CursorWorldImpact then
                     CursorWorldPos = endCoords
                     CursorGroundNormal = surfaceNormal
+                    DrawLine(endCoords, endCoords + surfaceNormal, 255, 255, 0, 255)
                 end
                 break
             end

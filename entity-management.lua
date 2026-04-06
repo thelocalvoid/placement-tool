@@ -53,7 +53,6 @@ local function createNewPoint(id, parentLineId, position, pointGroundNormal, you
         point.lineId = lineObject.id
     end
 
-    local variationLimits = PropLines[parentLineId].maxWobbleDegrees
     local xVar = ((seededRandom(seed) * 2) - 1)
     local zVar = ((seededRandom(seed*5) * 2) - 1)
     point.PosAndRotData.rotationVariation = vector3(xVar, 0.0, zVar)
@@ -67,10 +66,10 @@ local function createNewLine(entityName, firstPos)
     local id = #PropLines+1
     local newLine = {
         id = id,
-        prop = entityName,
+        propName = entityName,
         reverse = false,
         randomRotationZ = false,
-        alignToGroundNormal = false, -- ! Currently not functioning as intended
+        alignToGroundNormal = false, -- TODO: This now functions properly, i need to make a command to toggle
         offsetToRotationZ = 0,
         verticalOffset = 0,
         headOfLine = 1,
@@ -141,7 +140,7 @@ local function updateLineHeadingDirForPoint(point)
         local diff = cm_Diff_vec3(startCoords, endCoords)
         local dir = cm_Norm_vec3(diff)
         
-        point.PosAndRotData.baseLineHeadingDir = vector3(dir.x,dir.y,0.0)
+        point.PosAndRotData.baseLineHeadingDir = dir --vector3(dir.x,dir.y,0.0)
 
         
     else
@@ -153,7 +152,7 @@ local function updateLineHeadingDirForPoint(point)
         
             local diff = cm_Diff_vec3(startCoords, endCoords)
             local dir = cm_Norm_vec3(diff)
-            point.PosAndRotData.baseLineHeadingDir = vector3(dir.x,dir.y,0.0)
+            point.PosAndRotData.baseLineHeadingDir = dir -- vector3(dir.x,dir.y,0.0)
             
 
         elseif youngerId ~= -1 then
@@ -165,7 +164,7 @@ local function updateLineHeadingDirForPoint(point)
             local diff = cm_Diff_vec3(startCoords, endCoords)
             local dir = cm_Norm_vec3(diff)
 
-            point.PosAndRotData.baseLineHeadingDir = vector3(dir.x,dir.y,0.0)
+            point.PosAndRotData.baseLineHeadingDir = dir -- vector3(dir.x,dir.y,0.0)
             
         else
             point.PosAndRotData.baseLineHeadingDir = vector3(0.0, 1.0, 0.0)
@@ -174,31 +173,77 @@ local function updateLineHeadingDirForPoint(point)
 
 end
 
-local function rotateVectorXZ(vec, rotX_deg, rotZ_deg)
-    local radX = math.rad(rotX_deg)
-    local radZ = math.rad(rotZ_deg)
 
-    local cosX, sinX = math.cos(radX), math.sin(radX)
-    local cosZ, sinZ = math.cos(radZ), math.sin(radZ)
+local function rotateVectorAroundAxis(v, axis, angleRad)
+    local cosA = math.cos(angleRad)
+    local sinA = math.sin(angleRad)
 
-    -- Step 1: Rotate around X
-    local x1 = vec.x
-    local y1 = vec.y * cosX - vec.z * sinX
-    local z1 = vec.y * sinX + vec.z * cosX
+    local crossAV = cm_Cross_vec3(axis, v)
+    local dotAV = cm_Dot_vec3(axis, v)
 
-    -- Step 2: Rotate around Z
-    local x2 = x1 * cosZ - y1 * sinZ
-    local y2 = x1 * sinZ + y1 * cosZ
-    local z2 = z1
-
-    return vector3(x2, y2, z2)
+    return {
+        x = v.x * cosA + crossAV.x * sinA + axis.x * dotAV * (1 - cosA),
+        y = v.y * cosA + crossAV.y * sinA + axis.y * dotAV * (1 - cosA),
+        z = v.z * cosA + crossAV.z * sinA + axis.z * dotAV * (1 - cosA)
+    }
 end
 
-local function applyRotationVariation(U, rotationVariation, maxWobbleDegrees)
-    local vec = U
-    local rotX_deg = rotationVariation.x * maxWobbleDegrees
-    local rotZ_deg = rotationVariation.z * 360
-    return rotateVectorXZ(vec, rotX_deg, rotZ_deg)
+local function rotateU_onPlanes(F, R, U, degFU, degRF)
+    local radFU = math.rad(degFU)
+    local radRF = math.rad(degRF)
+
+    local cosFU = math.cos(radFU)
+    local sinFU = math.sin(radFU)
+
+    -- Step 1: rotate U in FU plane (around R)
+    local U1 = {
+        x = U.x * cosFU + F.x * sinFU,
+        y = U.y * cosFU + F.y * sinFU,
+        z = U.z * cosFU + F.z * sinFU
+    }
+
+    -- Step 2: rotate U1 around ORIGINAL U (RF plane)
+    local U2 = rotateVectorAroundAxis(U1, U, radRF)
+
+    return U2
+end
+
+local function applyRotationVariation(originalF, F, R, U, rotationVariation, maxWobbleDegrees)
+    
+    local degFU = rotationVariation.x * maxWobbleDegrees
+    local degRF = rotationVariation.z * 360
+    if maxWobbleDegrees ~= 0 then
+        U = rotateU_onPlanes(F, R, U, degFU, degRF)
+
+        F = cm_Norm_vec3(originalF)
+        U = cm_Norm_vec3(U)
+        R = cm_Norm_vec3(cm_Cross_vec3(F, U))
+        -- re-orthoganise
+        F = cm_Cross_vec3(U, R)
+    end
+
+    return F, R, U
+end
+
+local function rotateFRU_inFRPlane(F, R, U, degrees)
+    local rad = math.rad(degrees)
+    local cosT = math.cos(rad)
+    local sinT = math.sin(rad)
+
+    local F2 = {
+        x = F.x * cosT + R.x * sinT,
+        y = F.y * cosT + R.y * sinT,
+        z = F.z * cosT + R.z * sinT
+    }
+
+    local R2 = {
+        x = R.x * cosT - F.x * sinT,
+        y = R.y * cosT - F.y * sinT,
+        z = R.z * cosT - F.z * sinT
+    }
+
+    -- U unchanged
+    return F2, R2, U
 end
 
 local function rotateMatrixHeading(matrix, degs) -- !may not work
@@ -227,83 +272,6 @@ local function randomUnit2D(seed)
     }
 end
 
-local function old_matrixToQuat(matrix)
-    local m00, m10, m20  = table.unpack(matrix.R)
-    local m01, m11, m21 = table.unpack(matrix.U)
-    local m02, m12, m22 = table.unpack(matrix.F)
-    local tr = m00 + m11 + m22
-
-    print("MATRIX", m00, m10, m20)
-    print("MATRIX", m01, m11, m21)
-    print("MATRIX", m02, m12, m22)
-
-    local qw, qx, qy, qz
-
-    if (tr > 0) then
-        local S = math.sqrt(tr+1.0) * 2 -- S=4*qw 
-        qw = 0.25 * S
-        qx = (m21 - m12) / S
-        qy = (m02 - m20) / S 
-        qz = (m10 - m01) / S 
-    elseif ((m00 > m11) and (m00 > m22)) then
-        local S = math.sqrt(1.0 + m00 - m11 - m22) * 2 -- S=4*qx 
-        qw = (m21 - m12) / S
-        qx = 0.25 * S
-        qy = (m01 + m10) / S
-        qz = (m02 + m20) / S
-    elseif (m11 > m22) then
-        local S = math.sqrt(1.0 + m11 - m00 - m22) * 2 -- S=4*qy
-        qw = (m02 - m20) / S
-        qx = (m01 + m10) / S 
-        qy = 0.25 * S
-        qz = (m12 + m21) / S 
-    else
-        local S = math.sqrt(1.0 + m22 - m00 - m11) * 2 -- S=4*qz
-        qw = (m10 - m01) / S
-        qx = (m02 + m20) / S
-        qy = (m12 + m21) / S
-        qz = 0.25 * S
-    end
-
-    return vector4(qx, qy, qz, qw)
-end
-
-local function old_2_matrixToQuat(matrix)
-    local m00, m10, m20  = table.unpack(matrix.R)
-    local m01, m11, m21 = table.unpack(matrix.U)
-    local m02, m12, m22 = table.unpack(matrix.F)
-
-    local trace = m00 + m11 + m22
-    local x, y, z, w
-
-    if trace > 0 then
-        local s = math.sqrt(trace + 1.0) * 2
-        w = 0.25 * s
-        x = (m21 - m12) / s
-        y = (m02 - m20) / s
-        z = (m10 - m01) / s
-    elseif (m00 > m11) and (m00 > m22) then
-        local s = math.sqrt(1.0 + m00 - m11 - m22) * 2
-        w = (m21 - m12) / s
-        x = 0.25 * s
-        y = (m01 + m10) / s
-        z = (m02 + m20) / s
-    elseif m11 > m22 then
-        local s = math.sqrt(1.0 + m11 - m00 - m22) * 2
-        w = (m02 - m20) / s
-        x = (m01 + m10) / s
-        y = 0.25 * s
-        z = (m12 + m21) / s
-    else
-        local s = math.sqrt(1.0 + m22 - m00 - m11) * 2
-        w = (m10 - m01) / s
-        x = (m02 + m20) / s
-        y = (m12 + m21) / s
-        z = 0.25 * s
-    end
-
-    return vector4(x, y, z, w)
-end
 
 local function matrixToQuat(matrix)
 
@@ -386,71 +354,64 @@ function CompilePositionAndRotation(point)
 
     local propQuaternion = vector4(0.0,1.0,0.0,1.0)
 
-    local U = line.alignToGroundNormal and data.pointGroundNormal or vector(0.0,0.0,1.0)
-    local F = vector3(data.baseLineHeadingDir.x,data.baseLineHeadingDir.y,0.0)
+    local originalU = line.alignToGroundNormal and data.pointGroundNormal or vector(0.0,0.0,1.0)
+    local originalF = data.baseLineHeadingDir -- vector3(data.baseLineHeadingDir.x,data.baseLineHeadingDir.y,0.0)
+
+    local startDiff = propPosition - ClientCamCoords
+    local endDiff = propPosition + originalF - ClientCamCoords
+    local newStart = ClientCamCoords + (startDiff / #startDiff)
+    local newEnd = ClientCamCoords + (endDiff / #endDiff)
+    DrawLine(newStart, newEnd, 255, 255, 0, 255)
     
     local R = vector3(0.0,0.0,0.0)
 
     -- print(F, R, U)
 
-    F = cm_Norm_vec3(F)
-    if line.reverse then
-        R = -cm_Norm_vec3(cm_Cross_vec3(F, U))
-    else
-        R = cm_Norm_vec3(cm_Cross_vec3(F, U))
-    end
+    F = cm_Norm_vec3(originalF)
+    U = cm_Norm_vec3(originalU)
+    R = cm_Cross_vec3(F, U)
+    
+    R = cm_Norm_vec3(R)
     -- re-orthoganise
     F = cm_Norm_vec3(cm_Cross_vec3(U, R))
 
-    -- print(F, R, U)
+    local endDiff = propPosition + F - ClientCamCoords
+    local newStart = ClientCamCoords + (startDiff / #startDiff)
+    local newEnd = ClientCamCoords + (endDiff / #endDiff)
+    DrawLine(newStart, newEnd, 0, 255, 0, 255)
+    local endDiff = propPosition + R - ClientCamCoords
+    local newStart = ClientCamCoords + (startDiff / #startDiff)
+    local newEnd = ClientCamCoords + (endDiff / #endDiff)
+    DrawLine(newStart, newEnd, 255, 0, 0, 255)
+    local endDiff = propPosition + U - ClientCamCoords
+    local newStart = ClientCamCoords + (startDiff / #startDiff)
+    local newEnd = ClientCamCoords + (endDiff / #endDiff)
+    DrawLine(newStart, newEnd, 0, 0, 255, 255)
 
-    local currentMatrix = {
-        F = F,
-        R = R,
-        U = U,
-    }
     
     -- print(currentMatrix.F, currentMatrix.R, currentMatrix.U)
 
     if data.headingOverride then
         
-        F = vector3(data.headingOverrideDir.x, data.headingOverrideDir.y, 0.0)
+        F = data.headingOverrideDir -- vector3(data.headingOverrideDir.x, data.headingOverrideDir.y, 0.0)
+
 
         F = cm_Norm_vec3(F)
-        if line.reverse then
-            R = -cm_Norm_vec3(cm_Cross_vec3(F, U))
-        else
-            R = cm_Norm_vec3(cm_Cross_vec3(F, U))
-        end
+        U = cm_Norm_vec3(originalU)
+        R = cm_Cross_vec3(F, U)
+        
+        R = cm_Norm_vec3(R)
         -- re-orthoganise
         F = cm_Norm_vec3(cm_Cross_vec3(U, R))
 
-        currentMatrix = {
-            F = F,
-            R = R,
-            U = U,
-        }
     elseif line.randomRotationZ then
-        local seedRandoVec2 = randomUnit2D(point.seed)
+        local degs = data.rotationVariation.z * 7868
+        F, R, U = rotateFRU_inFRPlane(F, R, U, degs)
 
-        F = vector(seedRandoVec2.x, seedRandoVec2.y, 0.0)
-
-        if line.reverse then
-            R = -cm_Norm_vec3(cm_Cross_vec3(F, U))
-        else
-            R = cm_Norm_vec3(cm_Cross_vec3(F, U))
-        end
-        -- re-orthoganise
-        F = cm_Norm_vec3(cm_Cross_vec3(U, R))
-
-        currentMatrix = {
-            F = F,
-            R = R,
-            U = U,
-        }
+        -- TODO: Make this not relative to base heading
 
     else
-        F, R, U = rotateMatrixHeading(currentMatrix, line.offsetToRotationZ)
+        F, R, U = rotateFRU_inFRPlane(F, R, U, line.offsetToRotationZ)
     end
 
     -- turn the matrix into a quaternion
@@ -458,28 +419,33 @@ function CompilePositionAndRotation(point)
 
     F = cm_Norm_vec3(F)
     U = cm_Norm_vec3(U)
-    if line.reverse then
-        R = -cm_Norm_vec3(cm_Cross_vec3(F, U))
-    else
-        R = cm_Norm_vec3(cm_Cross_vec3(F, U))
-    end
+    R = cm_Norm_vec3(cm_Cross_vec3(F, U))
     -- re-orthoganise
     F = cm_Cross_vec3(U, R)
+
     -- print(currentMatrix.F)
     -- print(currentMatrix.R)
     -- print(currentMatrix.U)
 
-    local rotatedUpVec = applyRotationVariation(U, data.rotationVariation, line.maxWobbleDegrees)
-
-    F = cm_Norm_vec3(F)
-    U = cm_Norm_vec3(rotatedUpVec)
-    if line.reverse then
-        R = -cm_Norm_vec3(cm_Cross_vec3(F, U))
-    else
-        R = cm_Norm_vec3(cm_Cross_vec3(F, U))
+    F, R, U = applyRotationVariation(originalF, F, R, U, data.rotationVariation, line.maxWobbleDegrees)
+    
+    if line.reverse and not data.headingOverride then
+        R = -R
+        F = -F
     end
-    -- re-orthoganise
-    F = cm_Cross_vec3(U, R)
+
+    local endDiff = propPosition + F - ClientCamCoords
+    local newStart = ClientCamCoords + (startDiff / #startDiff)
+    local newEnd = ClientCamCoords + (endDiff / #endDiff)
+    DrawLine(newStart, newEnd, 0, 255, 0, 255)
+    local endDiff = propPosition + R - ClientCamCoords
+    local newStart = ClientCamCoords + (startDiff / #startDiff)
+    local newEnd = ClientCamCoords + (endDiff / #endDiff)
+    DrawLine(newStart, newEnd, 255, 0, 0, 255)
+    local endDiff = propPosition + U - ClientCamCoords
+    local newStart = ClientCamCoords + (startDiff / #startDiff)
+    local newEnd = ClientCamCoords + (endDiff / #endDiff)
+    DrawLine(newStart, newEnd, 0, 0, 255, 255)
 
 
     propQuaternion = matrixToQuat({F=F, R=R, U=U})
@@ -604,19 +570,19 @@ function EditPoint(lineId, pointId, newPosition, newGroundNormal)
         SetPointsPropPositionAndQuat(older)
     end
 
-
+    updateLineHeadingDirForPoint(point)
     point.propPosition, point.propQuaternion =  CompilePositionAndRotation(point)
     SetPointsPropPositionAndQuat(point)
 end
 
-function SetPointRotationOverride(lineId, pointId, RotateReturnDir, WasntOverriddenBefore)
+function SetPointRotationOverride(lineId, pointId, RotateDir, WasntOverriddenBefore)
     local line = PropLines[lineId]
     local point = line.points[pointId]
     if WasntOverriddenBefore then
         point.PosAndRotData.headingOverride = false
     else
         point.PosAndRotData.headingOverride = true
-        point.PosAndRotData.headingOverrideDir = RotateReturnDir
+        point.PosAndRotData.headingOverrideDir = RotateDir
     end
     point.propPosition, point.propQuaternion =  CompilePositionAndRotation(point)
     SetPointsPropPositionAndQuat(point)
@@ -670,7 +636,7 @@ end
 
 function OverridePointHeading(lineId, pointId, dirVec)
     local point = PropLines[lineId].points[pointId]
-    point.PosAndRotData.headingOverrideDir = vector3(0.0,0.0,0.0) + dirVec.xy
+    point.PosAndRotData.headingOverrideDir = dirVec
 
     
     point.propPosition, point.propQuaternion =  CompilePositionAndRotation(lineId, pointId)
@@ -696,7 +662,7 @@ function RemovePoint(lineId, pointId)
     -- print("Removing:", pointId, "from:", lineId)
 
     if point.previewEntityId ~= 0 then
-        ReturnEntityToPool(line.prop, point.previewEntityId)
+        ReturnEntityToPool(line.propName, point.previewEntityId)
     end
     -- Delete rect
     if point.rectId then
@@ -753,7 +719,7 @@ function RemoveLine(lineId)
     local line = PropLines[lineId]
     for key, value in pairs(line.points) do
         if value.previewEntityId ~= 0 then
-            ReturnEntityToPool(line.prop, value.previewEntityId)
+            ReturnEntityToPool(line.propName, value.previewEntityId)
         end
         if value.rectId then
             Rects[value.rectId] = nil
@@ -898,7 +864,7 @@ end
 --. Success!
 
 
-
+--BUG: RANGE MARKERS ARE ODD IN SOME MODES
 
 
 --NOTE: ADDED Cursor UX 
