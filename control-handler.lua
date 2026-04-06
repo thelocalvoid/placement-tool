@@ -139,8 +139,8 @@ end
 
 -- * ////////////// TOOL STATE CONTROLS //////////////
 
-local Vec3Direction = CMath.Vec3.Direction
-local Vec3Normalize = CMath.Vec3.Normalize
+local cm_Dir_vec3 = CMath.Vec3.Direction
+local cm_Norm_vec3 = CMath.Vec3.Normalize
 
 local toolStateControls = {
     [Enum.ToolStates.OBJECT] = function () -- ## OBJECT MODE
@@ -591,8 +591,8 @@ local toolStateControls = {
                 -- print(CurrentlySelectedPropLine, EditSelection, CursorWorldPos)
 
                 local point = PropLines[CurrentlySelectedPropLine].points[EditSelection]
-                local dir = Vec3Direction(point.PosAndRotData.pointPosition, CursorWorldPos)
-                local newDir = Vec3Normalize(vector3(dir.x, dir.y, 0.0))
+                local dir = cm_Dir_vec3(point.PosAndRotData.pointPosition, CursorWorldPos)
+                local newDir = cm_Norm_vec3(vector3(dir.x, dir.y, 0.0))
 
                 SetPointRotationOverride(CurrentlySelectedPropLine, EditSelection, newDir)
                 -- print("MOVED POINT:",EditSelection)
@@ -733,7 +733,7 @@ local ControlThreadFunction = function ()
         CurrentCameraControlFunction()
         Render()
 
-        -- print("control-handler.lua",ClientCoords)
+        -- print("control-handler.lua",ClientCamCoords)
         -- end
         
         

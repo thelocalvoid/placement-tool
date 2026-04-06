@@ -244,7 +244,7 @@ local CameraTypeControls = {
         local translation = translate(camFwd, camRight, camUp, fDot, rDot, uDot)
 
         local newPos = pos + (translation) * finalVelocity
-        ClientCoords = vec3(newPos.x, newPos.y, newPos.z)
+        ClientCamCoords = vec3(newPos.x, newPos.y, newPos.z)
         SetCamCoord(CurrentCameraId, newPos.x, newPos.y, newPos.z)
         currentCameraPos = newPos
         if not focusSet then
@@ -369,7 +369,7 @@ local CameraTypeControls = {
         local newPosXY = pos + (nVelocity + eVelocity) * finalVelocity
         local newPos = vector3(newPosXY.x, newPosXY.y, zNew)
 
-        ClientCoords = vec3(newPos.x, newPos.y, newPos.z)
+        ClientCamCoords = vec3(newPos.x, newPos.y, newPos.z)
         SetCamCoord(CurrentCameraId, newPos.x, newPos.y, newPos.z)
         SetCamFov(CurrentCameraId, newFov)
         -- local scale = GetLodscale()
@@ -428,7 +428,7 @@ local CameraTypeControls = {
         local newPos = pos + (fVelocity + hVelocity + vVelocity) * finalVelocity
 
 
-        ClientCoords = vec3(newPos.x, newPos.y, newPos.z)
+        ClientCamCoords = vec3(newPos.x, newPos.y, newPos.z)
         SetCamCoord(CurrentCameraId, newPos.x, newPos.y, newPos.z)
 
         if RCLICK then

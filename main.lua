@@ -12,23 +12,20 @@ LastClickWorldCoords = vector3(0.0,0.0,0.0)
 
 -- * ////////////// CAMERA DATA //////////////
 CurrentCameraId = 0
+ClientCamCoords = vector3(0.0,0.0,0.0)
+
 ClientCameraState = Enum.ClientCameraStates.GAMEPLAY
 ClientCameraStateOnClose = Enum.ClientCameraStates.MAP3D
 
 
 -- * ////////////// USER DATA //////////////
-ClientCoords = vector3(0.0,0.0,0.0)
 CursorWorldPos = vector3(0.0,0.0,0.0)
 CursorGroundNormal = vector3(0.0,0.0,0.0)
 CursorWorldImpact = false
 HasPerms = false
 
-MoveReturnPos = vector3(0.0,0.0,0.0)
-MoveReturnNormal = vector3(0.0,0.0,0.0)
-RotateReturnWasntOverridden = true
-RotateReturnDir = vector3(0.0,0.0,0.0)
-
 PropNameHistory = {}
+ActionHistory = {}
 
 
 -- * ////////////// OVERLAY DATA //////////////
@@ -68,6 +65,11 @@ CurrentlySelectedPropLine = -1
 CurrentHeadOfLine = -1
 EditSelection = -1
 PropLines = {}
+
+MoveReturnPos = vector3(0.0,0.0,0.0)
+MoveReturnNormal = vector3(0.0,0.0,0.0)
+RotateReturnWasntOverridden = true
+RotateReturnDir = vector3(0.0,0.0,0.0)
 
 
 -- * ////////////// PERM VERIFICATION //////////////
@@ -159,6 +161,9 @@ end)
 
 HasPerms = ShouldClientHavePerms()
 
+
+--* ////////////// CURSOR WORLD POS THREAD //////////////
+
 CreateThread(function (threadId)
     while true do
         local screenX = GetDisabledControlNormal(0, 239)
@@ -168,7 +173,7 @@ CreateThread(function (threadId)
         local offset = normal * 1000
         local testEnd = world + offset
 
-        local shapeTest = StartShapeTestLosProbe(ClientCoords.x, ClientCoords.y, ClientCoords.z, testEnd.x, testEnd.y, testEnd.z, 1, 0, 0)
+        local shapeTest = StartShapeTestLosProbe(ClientCamCoords.x, ClientCamCoords.y, ClientCamCoords.z, testEnd.x, testEnd.y, testEnd.z, 1, 0, 0)
         local retval, hit, endCoords, surfaceNormal, entityHit = GetShapeTestResult(shapeTest)
         while true do
             retval, hit, endCoords, surfaceNormal, entityHit = GetShapeTestResult(shapeTest)
@@ -186,6 +191,8 @@ CreateThread(function (threadId)
     end
 end)
 
+
+--* ////////////// RESOURCE CLEAN UP //////////////
 
 RegisterNetEvent("onResourceStop", function (resName)
     if resName == GetCurrentResourceName() then

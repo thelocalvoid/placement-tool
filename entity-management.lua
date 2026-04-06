@@ -4,13 +4,13 @@
 
 
 
-local DotVec3 = CMath.Vec3.Dot
-local DirVec3 = CMath.Vec3.Direction
-local DiffVec3 = CMath.Vec3.Difference
-local LerpVec3 = CMath.Vec3.Lerp
-local DistVec3 = CMath.Vec3.Distance
-local normalize = CMath.Vec3.Normalize
-local cross = CMath.Vec3.Cross
+local cm_Dot_vec3 = CMath.Vec3.Dot
+local cm_Dir_vec3 = CMath.Vec3.Direction
+local cm_Diff_vec3 = CMath.Vec3.Difference
+local cm_Lerp_vec3 = CMath.Vec3.Lerp
+local cm_Dist_vec3 = CMath.Vec3.Distance
+local cm_Norm_vec3 = CMath.Vec3.Normalize
+local cm_Cross_vec3 = CMath.Vec3.Cross
 
 -- * ////////////// DATA CREATION //////////////
 
@@ -138,8 +138,8 @@ local function updateLineHeadingDirForPoint(point)
         local startCoords = younger.PosAndRotData.pointPosition
         local endCoords = older.PosAndRotData.pointPosition
         
-        local diff = DiffVec3(startCoords, endCoords)
-        local dir = normalize(diff)
+        local diff = cm_Diff_vec3(startCoords, endCoords)
+        local dir = cm_Norm_vec3(diff)
         
         point.PosAndRotData.baseLineHeadingDir = vector3(dir.x,dir.y,0.0)
 
@@ -151,8 +151,8 @@ local function updateLineHeadingDirForPoint(point)
             local startCoords = point.PosAndRotData.pointPosition
             local endCoords = older.PosAndRotData.pointPosition
         
-            local diff = DiffVec3(startCoords, endCoords)
-            local dir = normalize(diff)
+            local diff = cm_Diff_vec3(startCoords, endCoords)
+            local dir = cm_Norm_vec3(diff)
             point.PosAndRotData.baseLineHeadingDir = vector3(dir.x,dir.y,0.0)
             
 
@@ -162,8 +162,8 @@ local function updateLineHeadingDirForPoint(point)
             local startCoords = younger.PosAndRotData.pointPosition
             local endCoords = point.PosAndRotData.pointPosition
         
-            local diff = DiffVec3(startCoords, endCoords)
-            local dir = normalize(diff)
+            local diff = cm_Diff_vec3(startCoords, endCoords)
+            local dir = cm_Norm_vec3(diff)
 
             point.PosAndRotData.baseLineHeadingDir = vector3(dir.x,dir.y,0.0)
             
@@ -213,8 +213,8 @@ local function rotateMatrixHeading(matrix, degs) -- !may not work
 
     F =  F * math.cos(rads)  +  R * math.sin(rads)
 
-    R = normalize(cross(F, U))
-    F = normalize(cross(U, R))
+    R = cm_Norm_vec3(cm_Cross_vec3(F, U))
+    F = cm_Norm_vec3(cm_Cross_vec3(U, R))
 
     return F, R, U
 end
@@ -347,7 +347,7 @@ local function matrixToQuat(matrix)
         z = 0.25 * s
     end
 
-    -- normalize quaternion (important)
+    -- cm_Norm_vec3 quaternion (important)
     local len = math.sqrt(x*x + y*y + z*z + w*w)
     return vector4(
         x/len,
@@ -393,14 +393,14 @@ function CompilePositionAndRotation(point)
 
     -- print(F, R, U)
 
-    F = normalize(F)
+    F = cm_Norm_vec3(F)
     if line.reverse then
-        R = -normalize(cross(F, U))
+        R = -cm_Norm_vec3(cm_Cross_vec3(F, U))
     else
-        R = normalize(cross(F, U))
+        R = cm_Norm_vec3(cm_Cross_vec3(F, U))
     end
     -- re-orthoganise
-    F = normalize(cross(U, R))
+    F = cm_Norm_vec3(cm_Cross_vec3(U, R))
 
     -- print(F, R, U)
 
@@ -416,14 +416,14 @@ function CompilePositionAndRotation(point)
         
         F = vector3(data.headingOverrideDir.x, data.headingOverrideDir.y, 0.0)
 
-        F = normalize(F)
+        F = cm_Norm_vec3(F)
         if line.reverse then
-            R = -normalize(cross(F, U))
+            R = -cm_Norm_vec3(cm_Cross_vec3(F, U))
         else
-            R = normalize(cross(F, U))
+            R = cm_Norm_vec3(cm_Cross_vec3(F, U))
         end
         -- re-orthoganise
-        F = normalize(cross(U, R))
+        F = cm_Norm_vec3(cm_Cross_vec3(U, R))
 
         currentMatrix = {
             F = F,
@@ -436,12 +436,12 @@ function CompilePositionAndRotation(point)
         F = vector(seedRandoVec2.x, seedRandoVec2.y, 0.0)
 
         if line.reverse then
-            R = -normalize(cross(F, U))
+            R = -cm_Norm_vec3(cm_Cross_vec3(F, U))
         else
-            R = normalize(cross(F, U))
+            R = cm_Norm_vec3(cm_Cross_vec3(F, U))
         end
         -- re-orthoganise
-        F = normalize(cross(U, R))
+        F = cm_Norm_vec3(cm_Cross_vec3(U, R))
 
         currentMatrix = {
             F = F,
@@ -456,30 +456,30 @@ function CompilePositionAndRotation(point)
     -- turn the matrix into a quaternion
     
 
-    F = normalize(F)
-    U = normalize(U)
+    F = cm_Norm_vec3(F)
+    U = cm_Norm_vec3(U)
     if line.reverse then
-        R = -normalize(cross(F, U))
+        R = -cm_Norm_vec3(cm_Cross_vec3(F, U))
     else
-        R = normalize(cross(F, U))
+        R = cm_Norm_vec3(cm_Cross_vec3(F, U))
     end
     -- re-orthoganise
-    F = cross(U, R)
+    F = cm_Cross_vec3(U, R)
     -- print(currentMatrix.F)
     -- print(currentMatrix.R)
     -- print(currentMatrix.U)
 
     local rotatedUpVec = applyRotationVariation(U, data.rotationVariation, line.maxWobbleDegrees)
 
-    F = normalize(F)
-    U = normalize(rotatedUpVec)
+    F = cm_Norm_vec3(F)
+    U = cm_Norm_vec3(rotatedUpVec)
     if line.reverse then
-        R = -normalize(cross(F, U))
+        R = -cm_Norm_vec3(cm_Cross_vec3(F, U))
     else
-        R = normalize(cross(F, U))
+        R = cm_Norm_vec3(cm_Cross_vec3(F, U))
     end
     -- re-orthoganise
-    F = cross(U, R)
+    F = cm_Cross_vec3(U, R)
 
 
     propQuaternion = matrixToQuat({F=F, R=R, U=U})
@@ -806,9 +806,9 @@ function GetPointPairPosIsInside(pos)
         -- Get Dot Product of both points
 
         -- Get first Dot Product
-        local dir =   DirVec3(youngerSibling.pos,   currentPoint.pos)
-        local diff1 = DiffVec3(pos, currentPoint.pos)
-        local dot1 =  DotVec3(diff1, dir)
+        local dir =   cm_Dir_vec3(youngerSibling.pos,   currentPoint.pos)
+        local diff1 = cm_Diff_vec3(pos, currentPoint.pos)
+        local dot1 =  cm_Dot_vec3(diff1, dir)
         -- test first dot product
         if dot1 >= 0 then
             -- print("Dot 1 success:", dot1)
@@ -817,8 +817,8 @@ function GetPointPairPosIsInside(pos)
             --     DrawRect(x , y , (24 / screenWidth), (24 / screenHeight), 0, 255, 255, 255)
             -- end
             -- Get Second Dot Product
-            local diff2 = DiffVec3(pos, youngerSibling.pos)
-            local dot2 =  DotVec3(diff2, -dir)
+            local diff2 = cm_Diff_vec3(pos, youngerSibling.pos)
+            local dot2 =  cm_Dot_vec3(diff2, -dir)
             -- test second dot product
             if dot2 >= 0 then
                 -- print("Dot 2 success:", dot2)
@@ -827,12 +827,12 @@ function GetPointPairPosIsInside(pos)
                 --     DrawRect(x , y , (24 / screenWidth), (24 / screenHeight), 0, 255, 255, 255)
                 -- end
                 -- If both are deemed inside, add to valid pairs
-                local midpoint = LerpVec3(youngerSibling.pos, currentPoint.pos, 0.5)
+                local midpoint = cm_Lerp_vec3(youngerSibling.pos, currentPoint.pos, 0.5)
                 validPairs[#validPairs+1] = {
                     lastPoint =    currentPoint,
                     firstPoint =   youngerSibling,
                     midpoint = midpoint,
-                    distFromMidpoint = DistVec3(midpoint, pos),
+                    distFromMidpoint = cm_Dist_vec3(midpoint, pos),
                 }
             else
                 -- print("Dot 2 fail:", dot2)

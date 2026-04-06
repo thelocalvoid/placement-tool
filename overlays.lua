@@ -46,7 +46,7 @@ local function drawRects()
     --     DrawRect(entry.x, entry.y, entry.width, entry.height, entry.r, entry.g, entry.b, entry.a)
     -- end
     local currentlyEditing = (ToolState == Enum.ToolStates.EDIT or ToolState == Enum.ToolStates.BUILD)
-    -- print("overlays.lua",ClientCoords)
+    -- print("overlays.lua",ClientCamCoords)
     for key, entry in pairs(rectsToDraw) do
 
         local rectType = entry.rectType
@@ -64,7 +64,7 @@ local function drawRects()
             end
         end
 
-        local dist = #(ClientCoords.xy - vector2(entry.x, entry.y))
+        local dist = #(ClientCamCoords.xy - vector2(entry.x, entry.y))
         local scale = calculateScale(dist, 25, 100, 0.16666, 1.0)
         local onscreen,  x, y = GetScreenCoordFromWorldCoord(entry.x, entry.y, entry.z)
         if onscreen then
@@ -90,10 +90,10 @@ local function drawLines()
         -- ! EXPERIMENTAL
         -- * This 3d nature of the lines, displaying  them directly infront of the camera
         -- # SEEMS TO WORK PRETTY WELL
-        local startDiff = entry.lineStart - ClientCoords
-        local endDiff = entry.lineEnd - ClientCoords
-        local newStart = ClientCoords + (startDiff / #startDiff)
-        local newEnd = ClientCoords + (endDiff / #endDiff)
+        local startDiff = entry.lineStart - ClientCamCoords
+        local endDiff = entry.lineEnd - ClientCamCoords
+        local newStart = ClientCamCoords + (startDiff / #startDiff)
+        local newEnd = ClientCamCoords + (endDiff / #endDiff)
 
         ---@diagnostic disable-next-line: missing-parameter, param-type-mismatch
         DrawLine(newStart, newEnd, lineColors[lineType])
@@ -177,7 +177,7 @@ local function drawDistance(lineNum, color)
     SetDrawOrigin(lineData.pos, 0)
     BeginTextCommandDisplayText('STRING')
         ---@diagnostic disable-next-line: missing-parameter, unused-function, param-type-mismatch
-    local dist = #(ClientCoords.xy - lineData.pos.xy)
+    local dist = #(ClientCamCoords.xy - lineData.pos.xy)
     local scale = calculateScale(dist, 0, 150, 0.25, 0.8)
     local text = FormatDistance(lineData.dist)
     SetTextScale(0.0, scale)

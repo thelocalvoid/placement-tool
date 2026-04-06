@@ -21,6 +21,9 @@ local timeStart
 
 -- end, true)
 
+--NOTE: Command wasn't available in 'production' version because it was registering a 'restricted' command from a client script
+--NOTE: Solution, Command is now registered in files.lua (server side)
+
 RegisterNetEvent("ppt-exportrequest", function(fileNamePrefix)
     
     timeStart = GetGameTimer()

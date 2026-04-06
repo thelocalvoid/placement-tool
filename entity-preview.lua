@@ -115,7 +115,7 @@ end
 -- filter out distant points
 -- 
 
-local Distance = CMath.Vec3.Distance
+local cm_Dist_vec3 = CMath.Vec3.Distance
 
 local pointsInRange = {}
 local timeToCompleteDistChecks = 2000
@@ -150,7 +150,7 @@ CreateThread(function (threadId)
             for key1, Line in pairs(PropLines) do
                 for key2, Point in pairs(Line.points) do
                     
-                    local dist = Distance(ClientCoords, Point.PosAndRotData.pointPosition)
+                    local dist = cm_Dist_vec3(ClientCamCoords, Point.PosAndRotData.pointPosition)
                     -- print(dist)
                     if dist < maxDistThreshold then
 
