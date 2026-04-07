@@ -159,8 +159,28 @@ local function drawCurrentToolState()
     BeginTextCommandDisplayText('STRING')
     local text = toolStateNames[ToolState].. " MODE"
     AddTextComponentSubstringPlayerName(text)
+    SetTextOutline()
     SetTextCentre(true)
     EndTextCommandDisplayText(0.5, 0.8)
+end
+
+
+local function drawControls()
+    local verticalOffset = 0.0175
+    for index, string in ipairs(ToolControls) do
+        -- print(string)
+        BeginTextCommandDisplayText('STRING')
+        AddTextComponentSubstringPlayerName(string)
+        SetTextOutline()
+        SetTextScale(0.24, 0.25)
+        EndTextCommandDisplayText(0.01, 0.4 + (index * verticalOffset))
+    end
+end
+
+local function draw2dElements()
+    drawCurrentToolState()
+    -- drawTooltip()
+    drawControls()
 end
 
 local function FormatDistance(dist)
@@ -211,7 +231,7 @@ function Render()
     drawSpheres()
 
     drawPreviews()
-    drawCurrentToolState()
+    draw2dElements()
     drawDistances()
 
 end

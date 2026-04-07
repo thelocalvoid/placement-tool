@@ -8,6 +8,7 @@ ToolEnabled = false
 ToolState = Enum.ToolStates.CREATE -- BUILD or MOVE
 LastClickScreenCoords = vector2(0.0,0.0)
 LastClickWorldCoords = vector3(0.0,0.0,0.0)
+ToolControls = {}
 
 
 -- * ////////////// CAMERA DATA //////////////

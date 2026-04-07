@@ -102,7 +102,9 @@ local execAfterModeSwitch = {
     end,
     [Enum.ToolStates.OBJECT] = function (afterData)
         SetPreview(Enum.PreviewModes.NONE)
-        CurrentlySelectedPropLine = -1
+        if not afterData.tabpress then
+            CurrentlySelectedPropLine = -1
+        end
         return
     end,
     [Enum.ToolStates.CREATE] = function (afterData)
@@ -125,6 +127,7 @@ local function switchToolState(newToolState, beforeData, afterData)
 
     --* Set new state
     ToolState = newToolState
+    ToolControls = HudElements.Modes[newToolState]()
 
     --* Config for new state
     if execAfterModeSwitch then
@@ -186,6 +189,7 @@ local toolStateControls = {
                 CurrentlySelectedPropLine = -1
                 print("Deselected lines")
             end
+            ToolControls = HudElements.Modes[ToolState]()
         elseif IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.TAB) then
 
             
@@ -207,10 +211,11 @@ local toolStateControls = {
         if IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.ESC) then
 
             switchToolState(Enum.ToolStates.OBJECT, {}, {})
+            ToolControls = HudElements.Modes[ToolState]()
             
         elseif IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.TAB) then
 
-            switchToolState(Enum.ToolStates.OBJECT, {}, {})
+            switchToolState(Enum.ToolStates.OBJECT, {}, {tabpress = true})
             
         elseif IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.T) then
 
@@ -696,6 +701,7 @@ local ControlThreadFunction = function ()
     -- print(Enum.PreviewModes.POINT)
     -- print(Enum.PreviewModes)
     SetPreview(Enum.PreviewModes.POINT)
+    ToolControls = HudElements.Modes[ToolState]()
     while controlThreadSwitch == 1 do
         -- usingController = (IsUsingKeyboard(0) == false)
 

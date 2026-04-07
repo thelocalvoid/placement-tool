@@ -13,6 +13,7 @@ client_scripts {
     'cmath.lua',
     'main.lua',
     'camera.lua',
+    'hud.lua',
     'overlays.lua',
     'entity-preview.lua',
     'entity-management.lua',
