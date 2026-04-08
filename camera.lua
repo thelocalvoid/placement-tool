@@ -209,6 +209,29 @@ function SetFocusPosition(vec3)
     SetFocusPosAndVel(vec3.x, vec3.y, vec3.z, 0.0, 0.0, 0.0)
 end
 
+local function constrainToMapBounds(coords)
+
+    local newCoords = coords
+
+    local xAbs = math.abs(newCoords.x)
+    if xAbs > 5000 then 
+        newCoords = vector3(((newCoords.x / xAbs) * 5000.0), newCoords.y, newCoords.z)
+    end
+
+    local yAbs = math.abs(newCoords.y)
+    if yAbs > 9000 then 
+        newCoords = vector3(newCoords.x, ((newCoords.y / yAbs) * 9000.0), newCoords.z)
+    end
+
+    if newCoords.z < -500 then
+        newCoords = vector3(newCoords.x, newCoords.y, -500.0) 
+    elseif newCoords.z > 4000 then
+        newCoords = vector3(newCoords.x, newCoords.y, 4000.0) 
+    end
+
+    return newCoords
+end
+
 
 local CameraTypeControls = {
 
@@ -269,6 +292,8 @@ local CameraTypeControls = {
         local newPosXY = pos + (nVelocity + eVelocity) * (finalVelocity * delta)
         local newPos = vector3(newPosXY.x, newPosXY.y, zNew)
 
+        newPos = constrainToMapBounds(newPos)
+
         ClientCamCoords = vec3(newPos.x, newPos.y, newPos.z)
         SetCamCoord(CurrentCameraId, newPos.x, newPos.y, newPos.z)
         SetCamFov(CurrentCameraId, newFov)
@@ -327,6 +352,7 @@ local CameraTypeControls = {
 
         local newPos = pos + (fVelocity + hVelocity + vVelocity) * (finalVelocity * delta)
 
+        newPos = constrainToMapBounds(newPos)
 
         ClientCamCoords = vec3(newPos.x, newPos.y, newPos.z)
         SetCamCoord(CurrentCameraId, newPos.x, newPos.y, newPos.z)
