@@ -256,8 +256,10 @@ local toolStateControls = {
         
         if CursorWorldImpact then
             SetMouseCursorStyle(Enum.MousePointerStyle.ARROW_PLUS)
+            SetPreview(Enum.PreviewModes.POINT)
         else
             SetMouseCursorStyle(Enum.MousePointerStyle.ARROW_DIMMED)
+            SetPreview(Enum.PreviewModes.NONE)
         end
 
         if IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.LMB) then
@@ -267,6 +269,8 @@ local toolStateControls = {
             LastClickScreenCoords = vector2(screenX, screenY)
 
             if CursorWorldImpact then
+
+                
                 -- Start a new line at world pos
                 LastClickWorldCoords = CursorWorldPos
 

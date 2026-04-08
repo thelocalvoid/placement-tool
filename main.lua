@@ -164,31 +164,75 @@ HasPerms = ShouldClientHavePerms()
 
 
 --* ////////////// CURSOR WORLD POS THREAD //////////////
-
+local map2dIndex = Enum.ClientCameraStates.MAP2D
+local map3dIndex = Enum.ClientCameraStates.MAP3D
 CreateThread(function (threadId)
     while true do
         local screenX = GetDisabledControlNormal(0, 239)
         local screenY = GetDisabledControlNormal(0, 240)
         local world, normal = GetWorldCoordFromScreenCoord(screenX, screenY)
-        
-        local offset = normal * 1000
-        local testEnd = world + offset
 
-        local shapeTest = StartShapeTestLosProbe(ClientCamCoords.x, ClientCamCoords.y, ClientCamCoords.z, testEnd.x, testEnd.y, testEnd.z, 1, 0, 0)
-        local retval, hit, endCoords, surfaceNormal, entityHit = GetShapeTestResult(shapeTest)
-        while true do
-            retval, hit, endCoords, surfaceNormal, entityHit = GetShapeTestResult(shapeTest)
-            if retval ~= 1 then
-                CursorWorldImpact = (hit == 1)
-                if CursorWorldImpact then
-                    CursorWorldPos = endCoords
-                    CursorGroundNormal = surfaceNormal
-                    DrawLine(endCoords, endCoords + surfaceNormal, 255, 255, 0, 255)
+        if (ClientCameraState == map2dIndex) then
+            -- local offset = normal * range
+            local zTop = GetHeightmapTopZForPosition(ClientCamCoords.x, ClientCamCoords.y)
+
+            -- print(zTop)
+
+            -- local startZ = zTop + 256
+            -- local endZ = zTop - 256
+
+            local diffZ = ClientCamCoords.z - (zTop + 256)
+
+            if diffZ < 2048 then
+                local normalToZ = normal * (-1/normal.z)
+                -- print(-1/normal.z)
+
+                local startPoz = ClientCamCoords + (normalToZ * diffZ)
+                local endPoz = startPoz + (normalToZ * 512)
+
+
+                local shapeTest = StartShapeTestLosProbe(startPoz.x, startPoz.y, startPoz.z, endPoz.x, endPoz.y, endPoz.z, 1, 0, 0)
+                local retval, hit, endCoords, surfaceNormal, entityHit = GetShapeTestResult(shapeTest)
+                while true do
+                    retval, hit, endCoords, surfaceNormal, entityHit = GetShapeTestResult(shapeTest)
+                    if retval ~= 1 then
+                        CursorWorldImpact = (hit == 1)
+                        if CursorWorldImpact then
+                            CursorWorldPos = endCoords
+                            CursorGroundNormal = surfaceNormal
+                            DrawLine(endCoords, endCoords + surfaceNormal, 255, 255, 0, 255)
+                        end
+                        break
+                    end
+                    Wait(0)
                 end
-                break
+            else
+                CursorWorldImpact = false
             end
-            Wait(0)
+            
+        elseif (ClientCameraState == map3dIndex) then
+            
+            local offset = normal * 256
+
+            local testEnd = ClientCamCoords + offset
+
+            local shapeTest = StartShapeTestLosProbe(ClientCamCoords.x, ClientCamCoords.y, ClientCamCoords.z, testEnd.x, testEnd.y, testEnd.z, 1, 0, 0)
+            local retval, hit, endCoords, surfaceNormal, entityHit = GetShapeTestResult(shapeTest)
+            while true do
+                retval, hit, endCoords, surfaceNormal, entityHit = GetShapeTestResult(shapeTest)
+                if retval ~= 1 then
+                    CursorWorldImpact = (hit == 1)
+                    if CursorWorldImpact then
+                        CursorWorldPos = endCoords
+                        CursorGroundNormal = surfaceNormal
+                        DrawLine(endCoords, endCoords + surfaceNormal, 255, 255, 0, 255)
+                    end
+                    break
+                end
+                Wait(0)
+            end
         end
+        
         Wait(0)
     end
 end)

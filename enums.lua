@@ -12,23 +12,33 @@ Enum.CameraControlKeys = {
     A = 65,
     S = 83,
     D = 68,
-    Q = 81,
     E = 69,
-    V = 236,
-    R = 45,
-    T = 309,
-    N = 306,
     G = 47,
     H = 304,
+    N = 306,
+    Q = 81,
+    R = 45,
+    T = 309,
+    V = 236,
+
+    ONE = 157,
+    TWO = 158,
+    THREE = 160,
+    FOUR = 164,
+    FIVE = 165,
+
     SHIFT = 16,
     BACKSPACE = 194,
     SPACE = 22,
     ESC = 200,
     TAB = 37,
+
     EQUALS = 83,
     MINUS = 84,
+
     VK_SPACE = 32,
     VK_DELETE = 46,
+
     LMB = 24,
     RMB = 25,
 }

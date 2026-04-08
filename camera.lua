@@ -240,11 +240,13 @@ local CameraTypeControls = {
         if zNew > 9000 then
             zNew = 9000
         end
-        if zNew - 500.0 < zBottom then
-            zNew = zBottom + 500
+        if zNew - 300.0 < zBottom then
+            zNew = zBottom + 300
+            -- print("CLIPPED")
         end
 
-        local zoomPercent = (zNew - 500 - zBottom) / (9000 - 500 - zBottom)
+        local zoomPercent = (zNew --[[  - 300 - zBottom ]]) / (9000 --[[  - 300 - zBottom ]])
+        -- print(zoomPercent)
 
 
         local wPower = IsRawKeyDown(Enum.CameraControlKeys.W) and 1 or 0
@@ -256,6 +258,7 @@ local CameraTypeControls = {
         local EDot = dPower - aPower
 
         local newFov = 5.0 + (20 * (zoomPercent * zoomPercent)) -- base on zoom
+        
         local finalVelocity = (50.0 + (2500 * (zoomPercent * zoomPercent * zoomPercent))) * velocityMultiplier-- based on zoom
 
         local nVelocity = n * NDot
@@ -275,7 +278,7 @@ local CameraTypeControls = {
 
         -- OverrideLodscaleThisFrame(lod) -- ! MAY CAUSE CRASHES
         
-        SetFocusPosAndVel(newPos.x, newPos.y, zMiddle, 0.0, 0.0, 0.0)
+        SetFocusPosAndVel(newPos.x, newPos.y, (zoomPercent * newPos.z) + ((1.0 - zoomPercent) * zMiddle), 0.0, 0.0, 0.0)
 
         
         -- print(zNew)
