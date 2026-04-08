@@ -81,7 +81,7 @@ local MouseSmoothingFunctions = {
 
             -- print(ms2_smoothedPitch * (((1-keyboard) * 2.5) + ((keyboard) * 6)), ms2_smoothedYaw * (((1-keyboard) * 2.5) + ((keyboard) * 6)))
             -- (((1-keyboard) * 2.5) + ((keyboard) * 6))
-            return ms2_smoothedPitch * (((1-keyboard) * 2.5) + ((keyboard) * 6)), ms2_smoothedYaw * (((1-keyboard) * 2.5) + ((keyboard) * 6))
+            return ms2_smoothedPitch * (((1-keyboard) * 2.5) + ((keyboard) * 9)), ms2_smoothedYaw * (((1-keyboard) * 2.5) + ((keyboard) * 9))
         end
     },
     {

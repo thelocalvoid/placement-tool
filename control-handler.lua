@@ -775,7 +775,7 @@ local ControlThreadFunction = function ()
         Wait(0)
     end
     stopDevWeather()
-    print("Loop Entered")
+    print("Loop Exited")
     EnableAllControlActions(Enum.PadType.PLAYER_CONTROL)
     EnableAllControlActions(Enum.PadType.CAMERA_CONTROL)
     controlThreadStatus = 0
