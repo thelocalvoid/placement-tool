@@ -42,9 +42,9 @@ HudElements = {
         end,
         [Enum.ToolStates.CREATE] = function ()
             local list = {}
-            list[1] = (CurrentlySelectedPropLine ~= -1) and strings.control_switchto_edit or ""
+            list[1] = ""
             list[2] = strings.control_switchto_escape
-            list[3] = strings.control_switchto_create
+            -- list[3] = strings.control_switchto_create
             return list
         end,
         [Enum.ToolStates.EDIT] = function ()

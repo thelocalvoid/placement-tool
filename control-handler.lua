@@ -159,6 +159,7 @@ local toolStateControls = {
                 RemoveLine(CurrentlySelectedPropLine)
                 print("Deleted line:", CurrentlySelectedPropLine)
                 CurrentlySelectedPropLine = -1
+                ToolControls = HudElements.Modes[ToolState]()
             end
         end
 
