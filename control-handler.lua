@@ -721,7 +721,7 @@ local stateBeforeMove = 0
 local ControlThreadFunction = function ()
     controlThreadStatus = 1
     print("Thread Started")
-    SetCameraState(ClientCameraState)
+    SetCameraState(ClientCameraStateOnClose)
     
     print("Loop Entered")
     -- print(SetPreview)
@@ -788,7 +788,7 @@ end
 
 local StartControlThread = function (startCameraType)
     controlThreadSwitch =  1
-    ClientCameraState = startCameraType
+    -- ClientCameraState = startCameraType
     CreateThread(ControlThreadFunction) 
 end
 

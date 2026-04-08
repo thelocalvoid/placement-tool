@@ -209,7 +209,7 @@ function SetFocusPosition(vec3)
     SetFocusPosAndVel(vec3.x, vec3.y, vec3.z, 0.0, 0.0, 0.0)
 end
 
-local function constrainToMapBounds(coords)
+local function constrainToMapBounds(coords, mode)
 
     local newCoords = coords
 
@@ -225,7 +225,7 @@ local function constrainToMapBounds(coords)
 
     if newCoords.z < -500 then
         newCoords = vector3(newCoords.x, newCoords.y, -500.0) 
-    elseif newCoords.z > 4000 then
+    elseif newCoords.z > (4000 + (mode * 10000)) then
         newCoords = vector3(newCoords.x, newCoords.y, 4000.0) 
     end
 
@@ -292,7 +292,7 @@ local CameraTypeControls = {
         local newPosXY = pos + (nVelocity + eVelocity) * (finalVelocity * delta)
         local newPos = vector3(newPosXY.x, newPosXY.y, zNew)
 
-        newPos = constrainToMapBounds(newPos)
+        newPos = constrainToMapBounds(newPos, 1)
 
         ClientCamCoords = vec3(newPos.x, newPos.y, newPos.z)
         SetCamCoord(CurrentCameraId, newPos.x, newPos.y, newPos.z)
@@ -352,7 +352,7 @@ local CameraTypeControls = {
 
         local newPos = pos + (fVelocity + hVelocity + vVelocity) * (finalVelocity * delta)
 
-        newPos = constrainToMapBounds(newPos)
+        newPos = constrainToMapBounds(newPos, 0)
 
         ClientCamCoords = vec3(newPos.x, newPos.y, newPos.z)
         SetCamCoord(CurrentCameraId, newPos.x, newPos.y, newPos.z)
@@ -425,20 +425,7 @@ CreateCustomTimeCycles()
 
 
 -- * ////////////// CAMERA TRANSITIONING //////////////
-local GetNewVectorsForFreecam = function (lastCoords, lastRotation, lastCameraType)
-    local newCoords = lastCoords
-    local newRotation = lastRotation
 
-    if lastCameraType == Enum.ClientCameraStates.MAP2D then
-        local height = GetHeightmapTopZForPosition(lastCoords.x, lastCoords.y)
-        newCoords = vector3(lastCoords.x, lastCoords.y, height)
-        newRotation = vector3(0.0,0.0,0.0)
-
-    end
-
-
-    return newCoords, newRotation, 45.0
-end
 local GetNewVectorsForMap2d = function (lastCoords, lastRotation, lastCameraType)
 
     local newCoords = vector3(lastCoords.x, lastCoords.y, 2001.0) -- !TEMP
@@ -449,15 +436,15 @@ local GetNewVectorsForMap2d = function (lastCoords, lastRotation, lastCameraType
 end
 local GetStartVectorsForMap3d = function (lastCoords, lastRotation, lastCameraType)
 
-    local newCoords = lastCoords
-    local newRotation = lastRotation
+    local lastTopZ = GetHeightmapTopZForPosition(lastCoords.x, lastCoords.y)
+    local newCoords = vector3(lastCoords.x - (50.0 * 0.7777777), lastCoords.y - (50.0 * 0.7777777), lastTopZ + (50.0 * 0.7777777))
+    local newRotation = vector3(-45.5, 0.0, -45.0)
     local newFov = 50.0
 
     return newCoords, newRotation, newFov
 end
 
 local GetVectorsFor = {
-    [Enum.ClientCameraStates.FREECAM] = GetNewVectorsForFreecam,
     [Enum.ClientCameraStates.MAP2D] = GetNewVectorsForMap2d,
     [Enum.ClientCameraStates.MAP3D] = GetStartVectorsForMap3d,
 
@@ -469,11 +456,11 @@ local executeBefore = {
     [Enum.ClientCameraStates.GAMEPLAY] = function ()
         
     end,
-    [Enum.ClientCameraStates.FREECAM] = function ()
-        
-    end,
     [Enum.ClientCameraStates.MAP2D] = function ()
         -- SetExtraTimecycleModifier(Enum.TimeCycles.REMOVE_FOG_DOF_FARCLIP.name)
+    end,
+    [Enum.ClientCameraStates.MAP3D] = function ()
+        
     end,
 }
 
@@ -482,11 +469,11 @@ local executeAfter = {
     [Enum.ClientCameraStates.GAMEPLAY] = function ()
         
     end,
-    [Enum.ClientCameraStates.FREECAM] = function ()
-        
-    end,
     [Enum.ClientCameraStates.MAP2D] = function ()
         -- ClearExtraTimecycleModifier()
+    end,
+    [Enum.ClientCameraStates.MAP3D] = function ()
+        
     end,
 }
 
@@ -534,12 +521,13 @@ local UpdateCamera = function(newCameraType, lastCameraType)
     local lastFov
 
     if lastCameraType == gameplayCamType then
-        lastCoords = GetGameplayCamCoord()
+        
+        lastCoords = GetEntityCoords(PlayerPedId())
         lastRotation = GetGameplayCamRot(Enum.RotationOrder.ROT_ZXY)
         lastFov = GetGameplayCamFov()
     else
-        lastCoords = GetCamRot(lastCam, Enum.RotationOrder.ROT_ZXY)
-        lastRotation = GetCamCoord(lastCam)
+        lastCoords = GetCamCoord(lastCam)
+        lastRotation = GetCamRot(lastCam, Enum.RotationOrder.ROT_ZXY)
         lastFov = GetCamFov(lastCam)
     end
 
@@ -644,6 +632,7 @@ end
 local UpdateCameraState = function(cameraState)
 
     print("UpdateCameraState")
+    local lastCameraState = ClientCameraState
     ClientCameraState = cameraState
 
     UpdateCamera(ClientCameraState, lastCameraState)
