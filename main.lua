@@ -199,5 +199,10 @@ end)
 RegisterNetEvent("onResourceStop", function (resName)
     if resName == GetCurrentResourceName() then
         ClearFocus()
+        SetDistantCarsEnabled(true)
+        SetCloudsAlpha(1.0)
+        ClearOverrideWeather()
+        ClearExtraTimecycleModifier()
+        NetworkClearClockTimeOverride()
     end
 end)

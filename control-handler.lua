@@ -688,11 +688,13 @@ local function setDevWeatherThisFrame()
     NetworkOverrideClockTime(0, 0, 0)
 end
 local function startDevWeather()
+    SetDistantCarsEnabled(false)
     SetCloudsAlpha(0.0)
     SetOverrideWeather("CLEAR")
     SetExtraTimecycleModifier(Enum.TimeCycles.DEV_WEATHERFX.name)
 end
 local function stopDevWeather()
+    SetDistantCarsEnabled(true)
     SetCloudsAlpha(1.0)
     ClearOverrideWeather()
     ClearExtraTimecycleModifier()
@@ -724,6 +726,7 @@ local ControlThreadFunction = function ()
     SetPreview(Enum.PreviewModes.POINT)
     ToolControls = HudElements.Modes[ToolState]()
     startDevWeather()
+    
     while controlThreadSwitch == 1 do
         setDevWeatherThisFrame()
         -- usingController = (IsUsingKeyboard(0) == false)
@@ -758,7 +761,7 @@ local ControlThreadFunction = function ()
         -- if usingController then
         --     ControllerCameraControls()
         -- else
-        CurrentCameraControlFunction()
+        CurrentCameraControlFunction(GetFrameTime())
         Render()
 
         -- print("control-handler.lua",ClientCamCoords)

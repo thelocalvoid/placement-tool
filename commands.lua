@@ -8,7 +8,7 @@ local Commands = {
     "ppt_closetool",
     "ppt_2dmap",
     "ppt_3dmap",
-    "ppt_3dfreecam",
+    -- "ppt_3dfreecam",
 }
 
 for key, value in pairs(Commands) do

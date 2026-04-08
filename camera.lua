@@ -36,7 +36,7 @@ local ms3_damping = 0.8 -- lower = faster decelerating, higher = slower decelera
 -- * ////////////// MOVEMENT TUNING //////////////
 local usingController = false
 
-local defaultVelocity = 0.5
+local defaultVelocity = 50.0
 local velocity = defaultVelocity
 
 local minBaseVelocity = 0.005
@@ -44,7 +44,7 @@ local maxBaseVelocity = 2.0
 local scrollVelocityStep = 0.005
 
 local velocityScale = 1.0
-local velocityScaleMin = 0.005
+local velocityScaleMin = 0.05
 local velocityScaleMax = 10.0
 local velocityScaleStep = 0.2
 
@@ -212,118 +212,10 @@ end
 
 local CameraTypeControls = {
 
-    [Enum.ClientCameraStates.GAMEPLAY] = function ()
+    [Enum.ClientCameraStates.GAMEPLAY] = function (delta)
         
     end,
-    [Enum.ClientCameraStates.FREECAM] = function ()
-        HideHudAndRadarThisFrame()
-        local camRight, camFwd, camUp, pos = GetCamMatrix(CurrentCameraId)
-
-        -- * MOVEMENT
-        
-        -- *    Shift key for speed boost
-        local shiftKeyHeld = IsDisabledControlPressed(Enum.PadType.PLAYER_CONTROL, 21)
-        local velocityMultiplier = shiftKeyHeld and boostedVelocityMultiplier or DefaultVelocityMultiplier
-
-
-        local wPower = IsRawKeyDown(Enum.CameraControlKeys.W) and 1 or 0
-        local sPower = IsRawKeyDown(Enum.CameraControlKeys.S) and 1 or 0
-        local fDot = wPower - sPower
-
-        local aPower = IsRawKeyDown(Enum.CameraControlKeys.A) and 1 or 0
-        local dPower = IsRawKeyDown(Enum.CameraControlKeys.D) and 1 or 0
-        local rDot = dPower - aPower
-
-        local ePower = IsRawKeyDown(Enum.CameraControlKeys.E) and 1 or 0
-        local qPower = IsRawKeyDown(Enum.CameraControlKeys.Q) and 1 or 0
-        local uDot = ePower - qPower
-
-        local finalVelocity = (velocity * velocityScale) * velocityMultiplier
-
-        fDot, rDot, uDot = movementSmoothingFunction(fDot, rDot, uDot)
-
-        local fVelocity = camFwd * fDot
-        local hVelocity = camRight * rDot
-        local vVelocity = verticalFunction(camUp, uDot)
-
-        local translation = translate(camFwd, camRight, camUp, fDot, rDot, uDot)
-
-        local newPos = pos + (translation) * finalVelocity
-        ClientCamCoords = vec3(newPos.x, newPos.y, newPos.z)
-        SetCamCoord(CurrentCameraId, newPos.x, newPos.y, newPos.z)
-        currentCameraPos = newPos
-        if not focusSet then
-            SetFocusPosition(newPos)
-        end
-
-        -- * ROTATION
-
-        -- UP +
-        -- DOWN -
-        -- RIGHT +
-        -- LEFT -
-        -- (IF INVERTED)
-        local mouseUDNormal = GetDisabledControlNormal(Enum.PadType.CAMERA_CONTROL, 2) * -1
-        local mouseLRNormal = GetDisabledControlNormal(Enum.PadType.CAMERA_CONTROL, 1) * -1
-
-        -- print(mouseLRNormal, mouseUDNormal)
-
-        local currentRot = GetCamRot(CurrentCameraId, Enum.RotationOrder.ROT_ZXY)
-
-        local PitchDelta, YawDelta = mouseSmoothingFunction(mouseUDNormal, mouseLRNormal, 1)
-
-        local rotX = currentRot.x
-        local newPitch = rotX + PitchDelta
-        local rotZ = currentRot.z
-        local newYaw = rotZ + YawDelta
-        
-        -- Clamp new pitch value to avoid flipping bug
-        if newPitch > 89.9 then
-            newPitch = 89.9
-        end
-        if newPitch < -89.9 then
-            newPitch = -89.9
-        end
-
-        -- Hardcode y value to 0.0 - We don't want rolling of the camera
-        SetCamRot(CurrentCameraId, newPitch, 0.0, newYaw, Enum.RotationOrder.ROT_ZXY)
-
-        -- * SPEED
-
-        local velocityScaleDelta = 0
-        velocityScaleDelta = IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, 16) and velocityScaleDelta - 1 or velocityScaleDelta
-        velocityScaleDelta = IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, 17) and velocityScaleDelta + 1 or velocityScaleDelta
-
-        velocityScale = velocityScale * (1 + (velocityScaleStep * velocityScaleDelta))
-        if velocityScale > velocityScaleMax then
-            velocityScale = velocityScaleMax
-        end
-        if velocityScale < velocityScaleMin then
-            velocityScale = velocityScaleMin
-        end
-
-        -- * FOV
-        local fovDelta = 0
-        fovDelta = IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.EQUALS) and fovDelta - 1 or fovDelta
-        fovDelta = IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.MINUS) and fovDelta + 1 or fovDelta
-
-        if fovDelta ~= 0 then
-            local fovDeltaMultiplier = shiftKeyHeld and 5 or 1
-            local finalFovDelta = fovDelta * fovDeltaMultiplier
-
-            local newFov = currentCameraFov + finalFovDelta
-            
-            SetCamFov(CurrentCameraId, newFov)
-
-            currentCameraFov = newFov
-
-            print(finalFovDelta, newFov)
-
-        end
-
-
-    end,
-    [Enum.ClientCameraStates.MAP2D] = function ()
+    [Enum.ClientCameraStates.MAP2D] = function (delta)
 
         HideHudAndRadarThisFrame()
 
@@ -364,14 +256,14 @@ local CameraTypeControls = {
         local EDot = dPower - aPower
 
         local newFov = 5.0 + (20 * (zoomPercent * zoomPercent)) -- base on zoom
-        local finalVelocity = (0.1 + (50 * (zoomPercent * zoomPercent * zoomPercent))) * velocityMultiplier-- based on zoom
+        local finalVelocity = (50.0 + (2500 * (zoomPercent * zoomPercent * zoomPercent))) * velocityMultiplier-- based on zoom
 
         local nVelocity = n * NDot
         local eVelocity = e * EDot
 
         -- local newPos = vector3(pos.x, pos.y, zNew) --! temp
 
-        local newPosXY = pos + (nVelocity + eVelocity) * finalVelocity
+        local newPosXY = pos + (nVelocity + eVelocity) * (finalVelocity * delta)
         local newPos = vector3(newPosXY.x, newPosXY.y, zNew)
 
         ClientCamCoords = vec3(newPos.x, newPos.y, newPos.z)
@@ -393,7 +285,7 @@ local CameraTypeControls = {
         -- print(finalVelocity)
 
     end,
-    [Enum.ClientCameraStates.MAP3D] = function ()
+    [Enum.ClientCameraStates.MAP3D] = function (delta)
 
         local velocityMultiplier = IsDisabledControlPressed(Enum.PadType.PLAYER_CONTROL, 21) and boostedVelocityMultiplier or DefaultVelocityMultiplier
         local RCLICK = IsDisabledControlPressed(Enum.PadType.PLAYER_CONTROL, 25)
@@ -430,7 +322,7 @@ local CameraTypeControls = {
         local hVelocity = r * rDot
         local vVelocity = up * uDot
 
-        local newPos = pos + (fVelocity + hVelocity + vVelocity) * finalVelocity
+        local newPos = pos + (fVelocity + hVelocity + vVelocity) * (finalVelocity * delta)
 
 
         ClientCamCoords = vec3(newPos.x, newPos.y, newPos.z)
@@ -470,138 +362,24 @@ local CameraTypeControls = {
             SetCamRot(CurrentCameraId, newPitch, 0.0, newYaw, Enum.RotationOrder.ROT_ZXY)
         end
 
+        local velocityScaleDelta = 0
+        velocityScaleDelta = IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, 16) and velocityScaleDelta - 1 or velocityScaleDelta
+        velocityScaleDelta = IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, 17) and velocityScaleDelta + 1 or velocityScaleDelta
+
+        velocityScale = velocityScale * (1 + (velocityScaleStep * velocityScaleDelta))
+        if velocityScale > velocityScaleMax then
+            velocityScale = velocityScaleMax
+        end
+        if velocityScale < velocityScaleMin then
+            velocityScale = velocityScaleMin
+        end
+
         SetFocusPosAndVel(newPos.x, newPos.y, newPos.z, 0.0, 0.0, 0.0)
         
     end,
 }
 
 CurrentCameraControlFunction = CameraTypeControls[ClientCameraStateOnClose]
-
-
-
-
-local function ControllerCameraControls()
-    HideHudAndRadarThisFrame()
-    local camRight, camFwd, camUp, pos = GetCamMatrix(CurrentCameraId)
-
-    local fXY = vector3(camFwd.x, camFwd.y, 0.0)
-    local dist = math.sqrt(fXY.x * fXY.x + fXY.y * fXY.y)
-    local fLevel = fXY * (1 / dist)
-
-    -- * MOVEMENT
-    
-    -- *    Shift key for speed boost
-    local shiftKeyHeld = IsDisabledControlPressed(Enum.PadType.PLAYER_CONTROL, 347)
-    local velocityMultiplier = shiftKeyHeld and boostedVelocityMultiplier or DefaultVelocityMultiplier
-
-    -- print("LS L/R:", GetDisabledControlNormal(0, 266))
-    -- print("LS U/D:", GetDisabledControlNormal(0, 268) * -1)
-    -- print("RS L/R:", GetDisabledControlNormal(0, 270))
-    -- print("RS U/D:", GetDisabledControlNormal(0, 272) * -1)
-    -- print("LT:", GetDisabledControlNormal(0, 252))
-    -- print("RT:", GetDisabledControlNormal(0, 253))
-
-    -- local wPower = IsRawKeyDown(Enum.CameraControlKeys.W) and 1 or 0
-    -- local sPower = IsRawKeyDown(Enum.CameraControlKeys.S) and 1 or 0
-    -- local fDot = wPower - sPower
-    local fDot = GetDisabledControlNormal(0, 268) * -1
-
-    -- local aPower = IsRawKeyDown(Enum.CameraControlKeys.A) and 1 or 0
-    -- local dPower = IsRawKeyDown(Enum.CameraControlKeys.D) and 1 or 0
-    -- local rDot = dPower - aPower
-    local rDot = GetDisabledControlNormal(0, 266)
-
-    -- local ePower = IsRawKeyDown(Enum.CameraControlKeys.E) and 1 or 0
-    -- local qPower = IsRawKeyDown(Enum.CameraControlKeys.Q) and 1 or 0
-    -- local uDot = ePower - qPower
-    local uDot = (GetDisabledControlNormal(0, 252) * -1) + GetDisabledControlNormal(0, 253)
-
-    local finalVelocity = (velocity * velocityScale) * velocityMultiplier
-
-    fDot, rDot, uDot = movementSmoothingFunction(fDot, rDot, uDot)
-
-
-    local fVelocity = fLevel * fDot
-    local hVelocity = camRight * rDot
-    local vVelocity = verticalFunction(camUp, uDot)
-
-    local translation = translate(camFwd, camRight, camUp, fDot, rDot, uDot)
-
-    local newPos = pos + (translation) * finalVelocity
-
-    SetCamCoord(CurrentCameraId, newPos.x, newPos.y, newPos.z)
-    currentCameraPos = newPos
-    if not focusSet then
-        SetFocusPosition(newPos)
-    end
-
-    -- * ROTATION
-
-    -- UP +
-    -- DOWN -
-    -- RIGHT +
-    -- LEFT -
-    -- (IF INVERTED)
-    -- local mouseUDNormal = GetDisabledControlNormal(Enum.PadType.CAMERA_CONTROL, 2) * -1
-    -- local mouseLRNormal = GetDisabledControlNormal(Enum.PadType.CAMERA_CONTROL, 1) * -1
-    local mouseUDNormal = GetDisabledControlNormal(0, 272) * -1
-    local mouseLRNormal = GetDisabledControlNormal(0, 270) * -1
-
-    -- print(mouseLRNormal, mouseUDNormal)
-
-    local currentRot = GetCamRot(CurrentCameraId, Enum.RotationOrder.ROT_ZXY)
-
-    local PitchDelta, YawDelta = mouseSmoothingFunction(mouseUDNormal, mouseLRNormal, 0)
-
-    local rotX = currentRot.x
-    local newPitch = rotX + PitchDelta
-    local rotZ = currentRot.z
-    local newYaw = rotZ + YawDelta
-    
-    -- Clamp new pitch value to avoid flipping bug
-    if newPitch > 89.9 then
-        newPitch = 89.9
-    end
-    if newPitch < -89.9 then
-        newPitch = -89.9
-    end
-
-    -- Hardcode y value to 0.0 - We don't want rolling of the camera
-    SetCamRot(CurrentCameraId, newPitch, 0.0, newYaw, Enum.RotationOrder.ROT_ZXY)
-
-    -- * SPEED
-
-    local velocityScaleDelta = 0
-    velocityScaleDelta = IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, 309) and velocityScaleDelta - 1 or velocityScaleDelta
-    velocityScaleDelta = IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, 303) and velocityScaleDelta + 1 or velocityScaleDelta
-
-    velocityScale = velocityScale * (1 + (velocityScaleStep * velocityScaleDelta))
-    if velocityScale > velocityScaleMax then
-        velocityScale = velocityScaleMax
-    end
-    if velocityScale < velocityScaleMin then
-        velocityScale = velocityScaleMin
-    end
-
-    -- * FOV
-    local fovDelta = 0
-    fovDelta = IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, 307) and fovDelta - 1 or fovDelta
-    fovDelta = IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, 308) and fovDelta + 1 or fovDelta
-
-    if fovDelta ~= 0 then
-        local fovDeltaMultiplier = shiftKeyHeld and 5 or 1
-        local finalFovDelta = fovDelta * fovDeltaMultiplier
-
-        local newFov = currentCameraFov + finalFovDelta
-        
-        SetCamFov(CurrentCameraId, newFov)
-
-        currentCameraFov = newFov
-
-        print(finalFovDelta, newFov)
-
-    end
-end
 
 
 -- * ////////////// TIMECYCLES //////////////
