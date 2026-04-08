@@ -1,114 +1,4 @@
 
-
-
--- local exmaple = 
--- [[
--- <?xml version="1.0" encoding="UTF-8"?>
--- <CMapData>
---  <name>hei_cs2_03_strm_1</name>
---  <parent />
---  <flags value="0" />
---  <contentFlags value="65" />
---  <streamingExtentsMin x="1903.26489" y="4844.69043" z="-131.74942" />   ///////////////// EXTENTS +/- LODDIST
---  <streamingExtentsMax x="2456.111" y="5334.76074" z="228.25058" />      ///////////////// EXTENTS +/- LODDIST
---  <entitiesExtentsMin x="1982.85217" y="4983.753" z="18.1131058" />      ///////////////// MODEL DIMENSIONS
---  <entitiesExtentsMax x="2372.549" y="5238.763" z="84.98944" />          ///////////////// MODEL DIMENSIONS
---  <entities>
---   <Item type="CEntityDef">
---    <archetypeName>prop_fncwood_17c</archetypeName>
---    <flags value="1572873" />
---    <guid value="3368619257" /> ///////////////// DYNAMIC
---    <position x="2107.95557" y="5212.16" z="55.7679825" /> ///////////////// DYNAMIC
---    <rotation x="-0.0335520059" y="-0.00207600021" z="0.989615142" w="0.139757022" /> ///////////////// DYNAMIC
---    <scaleXY value="1" />
---    <scaleZ value="1" />
---    <parentIndex value="-1" />
---    <lodDist value="80" /> ///////////////// DYNAMIC
---    <childLodDist value="0" />
---    <lodLevel>LODTYPES_DEPTH_ORPHANHD</lodLevel>
---    <numChildren value="0" />
---    <priorityLevel>PRI_REQUIRED</priorityLevel>
---    <extensions />
---    <ambientOcclusionMultiplier value="255" />
---    <artificialAmbientOcclusion value="255" />
---    <tintValue value="0" />
---   </Item>
---  </entities>
---  <containerLods itemType="rage__fwContainerLodDef" />
---  <boxOccluders itemType="BoxOccluder" />
---  <occludeModels itemType="OccludeModel" />
---  <physicsDictionaries />
---  <instancedData>
---   <ImapLink />
---   <PropInstanceList itemType="rage__fwPropInstanceListDef" />
---   <GrassInstanceList itemType="rage__fwGrassInstanceListDef" />
---  </instancedData>
---  <timeCycleModifiers itemType="CTimeCycleModifier" />
---  <carGenerators itemType="CCarGen" />
---  <LODLightsSOA>
---   <direction itemType="FloatXYZ" />
---   <falloff />
---   <falloffExponent />
---   <timeAndStateFlags />
---   <hash />
---   <coneInnerAngle />
---   <coneOuterAngleOrCapExt />
---   <coronaIntensity />
---  </LODLightsSOA>
---  <DistantLODLightsSOA>
---   <position itemType="FloatXYZ" />
---   <RGBI />
---   <numStreetLights value="0" />
---   <category value="0" />
---  </DistantLODLightsSOA>
---  <block>
---   <version value="0" />
---   <flags value="0" />
---   <name></name>
---   <exportedBy></exportedBy>
---   <owner></owner>
---   <time></time>
---  </block>
--- </CMapData>
--- ]]
-
-
-
-local function eulerToQuat(x, y, z) -- THANK YOU CHATGPT
-
-    if type(x) == "vector3" then
-        y = x.y
-        z = x.z
-        x = x.x
-    else
-        if type(x) ~="number" then
-            -- print("tried to convert invalid vector value to quaternion")
-            return
-        end
-    end
-
-    -- convert degrees → radians
-    local radX = math.rad(x)
-    local radY = math.rad(y)
-    local radZ = math.rad(z)
-
-    -- half angles
-    local cx = math.cos(radX * 0.5)
-    local sx = math.sin(radX * 0.5)
-    local cy = math.cos(radY * 0.5)
-    local sy = math.sin(radY * 0.5)
-    local cz = math.cos(radZ * 0.5)
-    local sz = math.sin(radZ * 0.5)
-
-    -- XYZ rotation order
-    local qw = cx * cy * cz + sx * sy * sz
-    local qx = sx * cy * cz - cx * sy * sz
-    local qy = cx * sy * cz + sx * cy * sz
-    local qz = cx * cy * sz - sx * sy * cz
-
-    return qx, qy, qz, qw
-end
-
 local function formatLine(linePattern, ...)
     -- print(...)
     local str = string.format(linePattern, table.unpack({...}))
@@ -347,19 +237,6 @@ local function SortPointDataToEntityFormat(entity)
 
 end
 
--- local headerExample = [[
--- <?xml version="1.0" encoding="UTF-8"?>
--- <CMapData>
---  <name>hei_cs2_03_strm_1</name>
---  <parent />
---  <flags value="0" />
---  <contentFlags value="65" />
---  <streamingExtentsMin x="1903.26489" y="4844.69043" z="-131.74942" />   ///////////////// EXTENTS +/- LODDIST
---  <streamingExtentsMax x="2456.111" y="5334.76074" z="228.25058" />      ///////////////// EXTENTS +/- LODDIST
---  <entitiesExtentsMin x="1982.85217" y="4983.753" z="18.1131058" />      ///////////////// MODEL DIMENSIONS
---  <entitiesExtentsMax x="2372.549" y="5238.763" z="84.98944" />          ///////////////// MODEL DIMENSIONS
--- ]]
-
 local headerStructure = {
     '<?xml version="1.0" encoding="UTF-8"?>\n',
     '<CMapData>\n',
@@ -403,47 +280,6 @@ local function CreateYmapHeader(data)
 
     return entitiesString
 end
-
-
--- local footerExample = [[
--- ' <containerLods itemType="rage__fwContainerLodDef" />\n',
--- ' <boxOccluders itemType="BoxOccluder" />\n',
--- '  <occludeModels itemType="OccludeModel" />\n',
--- '  <physicsDictionaries />\n',
--- '  <instancedData>\n',
--- '   <ImapLink />\n',
--- '   <PropInstanceList itemType="rage__fwPropInstanceListDef" />\n',
--- '   <GrassInstanceList itemType="rage__fwGrassInstanceListDef" />\n',
--- '  </instancedData>\n',
--- '  <timeCycleModifiers itemType="CTimeCycleModifier" />\n',
--- '  <carGenerators itemType="CCarGen" />\n',
--- '  <LODLightsSOA>\n',
--- '   <direction itemType="FloatXYZ" />\n',
--- '   <falloff />\n',
--- '   <falloffExponent />\n',
--- '   <timeAndStateFlags />\n',
--- '   <hash />\n',
--- '   <coneInnerAngle />\n',
--- '   <coneOuterAngleOrCapExt />\n',
--- '   <coronaIntensity />\n',
--- '  </LODLightsSOA>\n',
--- '  <DistantLODLightsSOA>\n',
--- '   <position itemType="FloatXYZ" />\n',
--- '   <RGBI />\n',
--- '   <numStreetLights value="0" />\n',
--- '   <category value="0" />\n',
--- '  </DistantLODLightsSOA>\n',
--- '  <block>\n',
--- '   <version value="0" />\n',
--- '   <flags value="0" />\n',
--- '   <name></name>\n',
--- '   <exportedBy></exportedBy>\n',
--- '   <owner></owner>\n',
--- '   <time></time>\n',
--- '  </block>\n',
--- ' </CMapData>\n',
--- ]]
-
 
 local footerStructure = {
     ' <containerLods itemType="rage__fwContainerLodDef" />\n',
@@ -545,8 +381,6 @@ local function ConvertGridDataIntoYmapData(ymapGrids, prefix)
 end
 
 function CompileEntitiesToYmap(propLineData, ymapNamePrefix)
-    local ymapData = {}
-    local retreivingData
 
     -- Determine which data should go into which ymap
     local gridYmaps = sortPointsIntoGrids(propLineData, ymapNamePrefix)

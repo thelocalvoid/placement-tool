@@ -1,3 +1,8 @@
+
+
+
+
+
 CurrentCameraControlFunction = function() end
 local CurrentCameraControllerFunction
 local cameraControlThreadSwitch = 0
@@ -340,14 +345,14 @@ local CameraTypeControls = {
         zNew = IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, 16) and zNew + 500 or zNew
         zNew = IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, 17) and zNew - 500 or zNew
 
-        if zNew > 10000 then
-            zNew = 10000
+        if zNew > 9000 then
+            zNew = 9000
         end
         if zNew - 500.0 < zBottom then
             zNew = zBottom + 500
         end
 
-        local zoomPercent = (zNew - 500 - zBottom) / (10000 - 500 - zBottom)
+        local zoomPercent = (zNew - 500 - zBottom) / (9000 - 500 - zBottom)
 
 
         local wPower = IsRawKeyDown(Enum.CameraControlKeys.W) and 1 or 0
@@ -661,7 +666,7 @@ local executeBefore = {
         
     end,
     [Enum.ClientCameraStates.MAP2D] = function ()
-        SetExtraTimecycleModifier(Enum.TimeCycles.REMOVE_FOG_DOF_FARCLIP.name)
+        -- SetExtraTimecycleModifier(Enum.TimeCycles.REMOVE_FOG_DOF_FARCLIP.name)
     end,
 }
 
@@ -674,7 +679,7 @@ local executeAfter = {
         
     end,
     [Enum.ClientCameraStates.MAP2D] = function ()
-        ClearExtraTimecycleModifier()
+        -- ClearExtraTimecycleModifier()
     end,
 }
 

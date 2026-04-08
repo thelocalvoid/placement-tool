@@ -169,7 +169,7 @@ local function updateLineHeadingDirForPoint(point)
         else
             point.PosAndRotData.baseLineHeadingDir = vector3(0.0, 1.0, 0.0)
         end
-    end    
+    end
 
 end
 
@@ -327,24 +327,6 @@ end
 
 
 function CompilePositionAndRotation(point)
-    
-    --? reverse = false,
-    --? randomRotationZ = false,
-    --? alignToGroundNormal = false,
-    --? offsetToRotationZ = 0,
-    --? verticalOffset = 0,
-
-    --? pointPosition = position,
-    --? pointGroundNormal = vector3(0.0,0.0,0.0),
-    --? baseLineHeading = 0,
-    --? headingOverride = 0,
-
-    --// ground normal
-    --// verticalOffset
-    --// headingOverride
-    --// elseif randomRotationZ
-    --// else calculated heading (baseLineHeading * reverse + offsetToRotationZ)
-    --. rotational variation
 
     local line = PropLines[point.parentId]
     local data = point.PosAndRotData
@@ -357,11 +339,11 @@ function CompilePositionAndRotation(point)
     local originalU = line.alignToGroundNormal and data.pointGroundNormal or vector(0.0,0.0,1.0)
     local originalF = data.baseLineHeadingDir -- vector3(data.baseLineHeadingDir.x,data.baseLineHeadingDir.y,0.0)
 
-    local startDiff = propPosition - ClientCamCoords
-    local endDiff = propPosition + originalF - ClientCamCoords
-    local newStart = ClientCamCoords + (startDiff / #startDiff)
-    local newEnd = ClientCamCoords + (endDiff / #endDiff)
-    DrawLine(newStart, newEnd, 255, 255, 0, 255)
+    -- local startDiff = propPosition - ClientCamCoords
+    -- local endDiff = propPosition + originalF - ClientCamCoords
+    -- local newEnd = ClientCamCoords + (endDiff / #endDiff)
+    -- local newStart = ClientCamCoords + (startDiff / #startDiff)
+    -- DrawLine(newStart, newEnd, 255, 255, 0, 255)
     
     local R = vector3(0.0,0.0,0.0)
 
@@ -375,18 +357,18 @@ function CompilePositionAndRotation(point)
     -- re-orthoganise
     F = cm_Norm_vec3(cm_Cross_vec3(U, R))
 
-    local endDiff = propPosition + F - ClientCamCoords
-    local newStart = ClientCamCoords + (startDiff / #startDiff)
-    local newEnd = ClientCamCoords + (endDiff / #endDiff)
-    DrawLine(newStart, newEnd, 0, 255, 0, 255)
-    local endDiff = propPosition + R - ClientCamCoords
-    local newStart = ClientCamCoords + (startDiff / #startDiff)
-    local newEnd = ClientCamCoords + (endDiff / #endDiff)
-    DrawLine(newStart, newEnd, 255, 0, 0, 255)
-    local endDiff = propPosition + U - ClientCamCoords
-    local newStart = ClientCamCoords + (startDiff / #startDiff)
-    local newEnd = ClientCamCoords + (endDiff / #endDiff)
-    DrawLine(newStart, newEnd, 0, 0, 255, 255)
+    -- local endDiff = propPosition + F - ClientCamCoords
+    -- local newStart = ClientCamCoords + (startDiff / #startDiff)
+    -- local newEnd = ClientCamCoords + (endDiff / #endDiff)
+    -- DrawLine(newStart, newEnd, 0, 255, 0, 255)
+    -- local endDiff = propPosition + R - ClientCamCoords
+    -- local newStart = ClientCamCoords + (startDiff / #startDiff)
+    -- local newEnd = ClientCamCoords + (endDiff / #endDiff)
+    -- DrawLine(newStart, newEnd, 255, 0, 0, 255)
+    -- local endDiff = propPosition + U - ClientCamCoords
+    -- local newStart = ClientCamCoords + (startDiff / #startDiff)
+    -- local newEnd = ClientCamCoords + (endDiff / #endDiff)
+    -- DrawLine(newStart, newEnd, 0, 0, 255, 255)
 
     
     -- print(currentMatrix.F, currentMatrix.R, currentMatrix.U)
@@ -434,18 +416,18 @@ function CompilePositionAndRotation(point)
         F = -F
     end
 
-    local endDiff = propPosition + F - ClientCamCoords
-    local newStart = ClientCamCoords + (startDiff / #startDiff)
-    local newEnd = ClientCamCoords + (endDiff / #endDiff)
-    DrawLine(newStart, newEnd, 0, 255, 0, 255)
-    local endDiff = propPosition + R - ClientCamCoords
-    local newStart = ClientCamCoords + (startDiff / #startDiff)
-    local newEnd = ClientCamCoords + (endDiff / #endDiff)
-    DrawLine(newStart, newEnd, 255, 0, 0, 255)
-    local endDiff = propPosition + U - ClientCamCoords
-    local newStart = ClientCamCoords + (startDiff / #startDiff)
-    local newEnd = ClientCamCoords + (endDiff / #endDiff)
-    DrawLine(newStart, newEnd, 0, 0, 255, 255)
+    -- local endDiff = propPosition + F - ClientCamCoords
+    -- local newStart = ClientCamCoords + (startDiff / #startDiff)
+    -- local newEnd = ClientCamCoords + (endDiff / #endDiff)
+    -- DrawLine(newStart, newEnd, 0, 255, 0, 255)
+    -- local endDiff = propPosition + R - ClientCamCoords
+    -- local newStart = ClientCamCoords + (startDiff / #startDiff)
+    -- local newEnd = ClientCamCoords + (endDiff / #endDiff)
+    -- DrawLine(newStart, newEnd, 255, 0, 0, 255)
+    -- local endDiff = propPosition + U - ClientCamCoords
+    -- local newStart = ClientCamCoords + (startDiff / #startDiff)
+    -- local newEnd = ClientCamCoords + (endDiff / #endDiff)
+    -- DrawLine(newStart, newEnd, 0, 0, 255, 255)
 
 
     propQuaternion = matrixToQuat({F=F, R=R, U=U})

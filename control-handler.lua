@@ -28,7 +28,7 @@ local function isCursorOverAnyPoint(cursorPos)
     return false, value
 end
 
-local function isCursorOverAnyPointInSelectedLine(cursorPos)
+local function isCursorOverAPointInSelectedLine(cursorPos)
     for key, value in pairs(Rects) do
         if value.parentLine == CurrentlySelectedPropLine then
             local bounds = {}
@@ -417,7 +417,7 @@ local toolStateControls = {
                 SetMouseCursorStyle(Enum.MousePointerStyle.ARROW_DIMMED)
             end
         else
-            local hover, rect = isCursorOverAnyPointInSelectedLine(vector2(screenX, screenY))
+            local hover, rect = isCursorOverAPointInSelectedLine(vector2(screenX, screenY))
             
             if hover then
                 SetMouseCursorStyle(Enum.MousePointerStyle.HAND_OPEN)
@@ -535,7 +535,7 @@ local toolStateControls = {
 
 
 
-        local hover, rect = isCursorOverAnyPointInSelectedLine(vector2(screenX, screenY))
+        local hover, rect = isCursorOverAPointInSelectedLine(vector2(screenX, screenY))
 
         if hover then
             SetMouseCursorStyle(Enum.MousePointerStyle.ARROW_MINUS)
@@ -619,7 +619,7 @@ local toolStateControls = {
                 SetMouseCursorStyle(Enum.MousePointerStyle.ARROW_DIMMED)
             end
         else
-            local hover, rect = isCursorOverAnyPointInSelectedLine(vector2(screenX, screenY))
+            local hover, rect = isCursorOverAPointInSelectedLine(vector2(screenX, screenY))
             
             if hover then
                 SetMouseCursorStyle(Enum.MousePointerStyle.HAND_OPEN)
@@ -681,6 +681,26 @@ local toolStateControls = {
 }
 
 
+
+-- * ////////////// ENVIRONMENT //////////////
+--* Set time, clouds, timecycle
+local function setDevWeatherThisFrame()
+    NetworkOverrideClockTime(0, 0, 0)
+end
+local function startDevWeather()
+    SetCloudsAlpha(0.0)
+    SetOverrideWeather("CLEAR")
+    SetExtraTimecycleModifier(Enum.TimeCycles.DEV_WEATHERFX.name)
+end
+local function stopDevWeather()
+    SetCloudsAlpha(1.0)
+    ClearOverrideWeather()
+    ClearExtraTimecycleModifier()
+    NetworkClearClockTimeOverride()
+end
+
+
+
 -- * ////////////// CONTROL THREAD MANAGEMENT //////////////
 
 local controlThreadSwitch = 0
@@ -703,7 +723,9 @@ local ControlThreadFunction = function ()
     -- print(Enum.PreviewModes)
     SetPreview(Enum.PreviewModes.POINT)
     ToolControls = HudElements.Modes[ToolState]()
+    startDevWeather()
     while controlThreadSwitch == 1 do
+        setDevWeatherThisFrame()
         -- usingController = (IsUsingKeyboard(0) == false)
 
         DisableAllControlActions(Enum.PadType.PLAYER_CONTROL)
@@ -745,6 +767,7 @@ local ControlThreadFunction = function ()
         
         Wait(0)
     end
+    stopDevWeather()
     print("Loop Entered")
     EnableAllControlActions(Enum.PadType.PLAYER_CONTROL)
     EnableAllControlActions(Enum.PadType.CAMERA_CONTROL)

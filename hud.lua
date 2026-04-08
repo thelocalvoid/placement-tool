@@ -1,20 +1,11 @@
+
+
+
+
+
 local function makeString(key, text)
     return string.format("~y~[%s]~w~ %s", key, text)
 end
-
-local strings = {
-    control_switchto_build =     "[T] ADD TOOL",
-    control_switchto_grab =      "[G] GRAB TOOL",
-    control_switchto_remove =    "[R] REMOVE TOOL",
-    control_switchto_subdivide = "[V] SUBDIVIDE TOOL",
-    control_switchto_heading =   "[H] HEADING OVERRIDE TOOL",
-
-    control_switchto_edit =      "[TAB] EDIT MODE",
-    control_switchto_object =    "[TAB] OBJECT MODE",
-    control_switchto_escape =    "[ESC] -> EDIT -> OBJECT",
-
-    control_switchto_create =    "[N] CREATE TOOL",
-}
 
 local strings = {
     control_switchto_build =     makeString("T", "ADD TOOL"),
