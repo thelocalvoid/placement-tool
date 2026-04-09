@@ -47,17 +47,32 @@ DistPreviews = {
 }
 
 function CalculateDistOfPreviewLine(lineNum)
-    local difference = vector3(0.0,0.0,0.0)
+    
     if lineNum == 1 then
-        difference = CursorWorldPos - Previews.Line.startPos
+        local difference = CursorWorldPos - Previews.Line.startPos
+        DistPreviews[lineNum] = {
+            pos = CursorWorldPos,
+            dist = #difference
+        }
     elseif lineNum == 2 then
-        difference = CursorWorldPos - Previews.Line2.startPos
+        local difference = CursorWorldPos - Previews.Line2.startPos
+        DistPreviews[lineNum] = {
+            pos = CursorWorldPos,
+            dist = #difference
+        }
+    elseif lineNum == 3 then
+        local difference1 = CursorWorldPos - Previews.Line.startPos
+        local difference2 = CursorWorldPos - Previews.Line2.startPos
+        DistPreviews[1] = {
+            pos = Previews.Line.startPos + (difference1 * 0.5),
+            dist = #difference1
+        }
+        DistPreviews[2] = {
+            pos = Previews.Line2.startPos + (difference2 * 0.5),
+            dist = #difference2
+        }
     end
 
-    DistPreviews[lineNum] = {
-        pos = CursorWorldPos,
-        dist = #difference
-    }
 end
 
 

@@ -288,14 +288,23 @@ local toolStateControls = {
                 if inputUpdate == 1 then -- User hit OK in the text input box
                     input = GetOnscreenKeyboardResult()
                     print("You wrote this in the input box:", input)
-                    if not IsModelValid(input) then
+                    
+                    if not IsModelInCdimage(input) then -- !trying IsModelInCdimage instead of IsModelValid
                         print("Input was invalid, please enter valid archetype name")
                         return
                     else
+
+                        RequestModel(input)
+                        while not HasModelLoaded(input) do
+                            Wait(0)
+                        end
+
                         if IsModelAVehicle(input) or IsModelAPed(input) then
                             print("Archetype name is a ped or a vehicle - Not allowed")
                             return
                         end
+
+                        SetModelAsNoLongerNeeded(input)
                         print("Success!")
                     end
                 elseif inputUpdate == 2 then
@@ -396,7 +405,9 @@ local toolStateControls = {
 
         -- print(EditSelection)
         if EditSelection ~= -1 then
+                
             if CursorWorldImpact then
+                CalculateDistOfPreviewLine(3)
                 SetMouseCursorStyle(Enum.MousePointerStyle.HAND_GRAB)
                 
                 -- print(CurrentlySelectedPropLine, EditSelection, CursorWorldPos)
@@ -421,6 +432,7 @@ local toolStateControls = {
                 SetMouseCursorStyle(Enum.MousePointerStyle.ARROW_DIMMED)
             end
         else
+            SetPreview(Enum.PreviewModes.NONE)
             local hover, rect = isCursorOverAPointInSelectedLine(vector2(screenX, screenY))
             
             if hover then
@@ -434,12 +446,32 @@ local toolStateControls = {
                 LastClickScreenCoords = vector2(screenX, screenY)
 
                 if hover then
-                    --* START MOVING POINT
+
                     EditSelection = rect.parentPoint
+
+                    --* START MOVING POINT
                     -- print(EditSelection)
                     MoveReturnPos, MoveReturnNormal = GetMoveReturnDataForPoint(CurrentlySelectedPropLine, EditSelection)
                     -- print(EditSelection)
                     SetMouseCursorStyle(Enum.MousePointerStyle.HAND_GRAB)
+
+                    
+
+                    local point = PropLines[CurrentlySelectedPropLine].points[EditSelection]
+
+                    if point.olderSibling ~= -1 and point.youngerSibling ~= -1 then
+                        Previews.Line.startPos = PropLines[CurrentlySelectedPropLine].points[point.youngerSibling].PosAndRotData.pointPosition
+                        Previews.Line2.startPos = PropLines[CurrentlySelectedPropLine].points[point.olderSibling].PosAndRotData.pointPosition
+                        SetPreview(Enum.PreviewModes.SUBDPREVIEW)
+                    elseif point.olderSibling ~= -1 then
+                        Previews.Line.startPos = PropLines[CurrentlySelectedPropLine].points[point.olderSibling].PosAndRotData.pointPosition
+                        SetPreview(Enum.PreviewModes.LINEANDPOINT)
+                    elseif point.youngerSibling ~= -1 then
+                        Previews.Line.startPos = PropLines[CurrentlySelectedPropLine].points[point.youngerSibling].PosAndRotData.pointPosition
+                        SetPreview(Enum.PreviewModes.LINEANDPOINT)
+                    end
+
+                    
                 else
                     print("Missed")
                 end
@@ -482,6 +514,7 @@ local toolStateControls = {
                 
                 SetMouseCursorStyle(Enum.MousePointerStyle.ARROW_PLUS)
                 SetPreview(Enum.PreviewModes.SUBDPREVIEW)
+                CalculateDistOfPreviewLine(3)
 
                 local olderSibling = closestPair.lastPoint
                 local youngerSibling = closestPair.firstPoint
@@ -636,14 +669,14 @@ local toolStateControls = {
                 LastClickScreenCoords = vector2(screenX, screenY)
                 if hover then
                     EditSelection = rect.parentPoint
-                    print(EditSelection)
+                    -- print(EditSelection)
                     RotateReturnWasntOverridden, RotateReturnDir = GetRotateReturnDataForPoint(CurrentlySelectedPropLine, EditSelection)
 
                     SetMouseCursorStyle(Enum.MousePointerStyle.HAND_GRAB)
                     Previews.Line.startPos = PropLines[CurrentlySelectedPropLine].points[EditSelection].PosAndRotData.pointPosition
                     SetPreview(Enum.PreviewModes.LINEANDPOINT)
 
-                    print(EditSelection)
+                    -- print(EditSelection)
                     
                 else
                     print("missed")
@@ -658,7 +691,16 @@ local toolStateControls = {
 
         elseif IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.BACKSPACE) then
 
-            switchToolState(Enum.ToolStates.EDIT, {removeOverride = true}, {})
+            SetPointRotationOverride(CurrentlySelectedPropLine, EditSelection, RotateReturnDir, true)
+
+            if EditSelection ~= -1 then
+
+                SetPointRotationOverride(CurrentlySelectedPropLine, EditSelection, RotateReturnDir, true)
+
+                EditSelection = -1
+                SetPreview(Enum.PreviewModes.NONE)
+                SetMouseCursorStyle(Enum.MousePointerStyle.ARROW)
+            end
 
         elseif IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.H) then
 
@@ -884,7 +926,7 @@ RegisterCommand("SetLineReverse", function (source, args)
 
 end, false)
 
-RegisterCommand("SetLineRandomRot", function (source, args)
+RegisterCommand("SetLineRandomRotation", function (source, args)
     if CurrentlySelectedPropLine == -1 then
         return
     end
@@ -905,3 +947,28 @@ RegisterCommand("SetLineRandomRot", function (source, args)
     end
 
 end, false)
+
+RegisterCommand("SetLineAlignToNormal", function (source, args)
+    if CurrentlySelectedPropLine == -1 then
+        return
+    end
+    local choice = args[1]
+
+    if choice == "1" then
+        choice = "true"
+    elseif choice == "0" then
+        choice = "false"
+    end
+    
+    choice = string.lower(choice)
+    if choice == "true" or choice == "false" then
+        local bool = choice == "true" and true or false
+        SetLineAlignToNormal(CurrentlySelectedPropLine, bool)
+    else
+        print("PLEASE ENTER VALID RESPONSE ( 1/0 or true/false )")
+    end
+
+end, false)
+
+
+-- TODO: Show line settings (LineAlignToNormal = false, SetLineRandomRotation = true, etc)

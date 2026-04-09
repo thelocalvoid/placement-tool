@@ -204,11 +204,7 @@ local function drawDistance(lineNum, color)
     SetTextColour(175, 0, 175, 255)
     AddTextComponentSubstringPlayerName(text)
     SetTextCentre(true)
-    if lineNum == 1 then
-        EndTextCommandDisplayText(0.0, -0.1  * scale)
-    else
-        EndTextCommandDisplayText(0.0, 0.0)
-    end
+    EndTextCommandDisplayText(0.0, 0.0)
 end 
 local function drawDistances()
     if PreviewLine then
@@ -258,7 +254,7 @@ function AddSphere(pos)
         a = 1.0
     }
     Spheres[id] = newSphere
-    print("AddSphere", "id", id)
+    -- print("AddSphere", "id", id)
     return id
 end
 
@@ -281,12 +277,12 @@ function AddRect(pos, rectType, parentLine, parentPoint)
         parentPoint = parentPoint,
     }
     Rects[id] = newRect
-    print("AddRect", "id", id)
+    -- print("AddRect", "id", id)
     return id
 end
 
 function AddLine(coords, lineType, parent)
-    print("Add overlay Line", coords.startCoords, coords.endCoords)
+    -- print("Add overlay Line", coords.startCoords, coords.endCoords)
     lineCounter = lineCounter + 1
     local id = lineCounter
     local newLine = {
@@ -297,7 +293,7 @@ function AddLine(coords, lineType, parent)
         lineEnd = coords.endCoords,
     }
     Lines[id] = newLine
-    print("New overlay sline", "id", id)
+    -- print("New overlay sline", "id", id)
     return id, Lines[id]
 end
 

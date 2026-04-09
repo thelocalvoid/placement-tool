@@ -615,6 +615,13 @@ function SetLineReverseRotation(lineId, bool)
     recompileLineProps(line)
 end
 
+--* ALIGN TO NORMAL
+function SetLineAlignToNormal(lineId, bool)
+    local line = PropLines[lineId]
+    line.alignToGroundNormal = bool
+    recompileLineProps(line)
+end
+
 
 function OverridePointHeading(lineId, pointId, dirVec)
     local point = PropLines[lineId].points[pointId]
