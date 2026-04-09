@@ -21,6 +21,7 @@ local strings = {
     control_switchto_create =    controlString( "N",         "CREATE TOOL" ),
     control_switchto_delete =    controlString( "DEL",       "DELETE SELECTED LINE" ),
     
+    control_select_line =        controlString( "CLICK",     "SELECT LINE" ),
     control_create_line =        controlString( "CLICK",     "CREATE NEW LINE" ),
     control_create_point =       controlString( "CLICK",     "ADD POINT" ),
     control_delete_point =       controlString( "CLICK",     "DELETE POINT" ),
@@ -36,7 +37,8 @@ HudElements = {
             local list = {}
             list[1] = (CurrentlySelectedPropLine ~= -1) and strings.control_switchto_edit or ""
             list[2] = strings.control_switchto_create
-            list[3] = (CurrentlySelectedPropLine ~= -1) and strings.control_switchto_delete or ""
+            list[3] = strings.control_select_line
+            list[4] = (CurrentlySelectedPropLine ~= -1) and strings.control_switchto_delete or ""
             return list
         end,
         [Enum.ToolStates.CREATE] = function ()
