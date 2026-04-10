@@ -14,11 +14,13 @@ local rectsToDraw = {}
 
 local maxLines = 10000
 local maxSpheres = 10000
-local maxRects = 10000
+local maxRects = 500 -- Rects are limited by gta to 500 per frame
 
 local screenWidth
 local screenHeight
 local aspectRatio
+
+local secondFrame = false
 
 function lerpClamped(x, min, max)
     local t = (x - min) / (max - min)
@@ -41,38 +43,86 @@ local function drawSpheres()
         DrawSphere(entry.x, entry.y, entry.z, entry.radius, entry.r, entry.g, entry.b, entry.a)
     end
 end
-local function drawRects()
-    -- for key, entry in pairs(rectsToDraw) do
-    --     DrawRect(entry.x, entry.y, entry.width, entry.height, entry.r, entry.g, entry.b, entry.a)
-    -- end
-    local currentlyEditing = (ToolState == Enum.ToolStates.EDIT or ToolState == Enum.ToolStates.BUILD)
-    -- print("overlays.lua",ClientCamCoords)
-    for key, entry in pairs(rectsToDraw) do
 
-        local rectType = entry.rectType
-        if entry.parentLine ~= CurrentlySelectedPropLine then
-            rectType = Enum.LineDrawType.UNSELECTED
-        else
-            if currentlyEditing then
-                if entry.parentPoint == CurrentHeadOfLine then
-                    rectType = Enum.LineDrawType.EDITHEAD
-                end 
-                if EditSelection == entry.parentPoint then
-                    
-                    rectType = Enum.LineDrawType.EDITSELECT
+local secondFrameRectCache = {}
+local currentlyEditing = false
+
+local function drawRects()
+
+    if not secondFrame then
+        currentlyEditing = (ToolState == Enum.ToolStates.EDIT or ToolState == Enum.ToolStates.BUILD)
+
+        for key, entry in pairs(rectsToDraw) do
+
+            local id = entry.id
+
+
+
+            local dist = #(ClientCamCoords.xy - vector2(entry.x, entry.y))
+            local scale = calculateScale(dist, 25, 100, 0.16666, 1.0)
+            local onscreen,  x, y = GetScreenCoordFromWorldCoord(entry.x, entry.y, entry.z)
+
+            secondFrameRectCache[id].scale = scale
+            secondFrameRectCache[id].onscreen = onscreen
+            secondFrameRectCache[id].x = x
+            secondFrameRectCache[id].y = y
+
+            if onscreen then
+
+                local rectType = entry.rectType
+                if entry.parentLine ~= CurrentlySelectedPropLine then
+                    rectType = Enum.LineDrawType.UNSELECTED
+                else
+                    if currentlyEditing then
+                        if entry.parentPoint == CurrentHeadOfLine then
+                            rectType = Enum.LineDrawType.EDITHEAD
+                        end 
+                        if EditSelection == entry.parentPoint then
+                            
+                            rectType = Enum.LineDrawType.EDITSELECT
+                        end
+                    end
                 end
+
+                DrawRect(x , y , (entry.width / screenWidth) * scale, (entry.height / screenHeight) * scale, lineColors[rectType])
+                Rects[id].ScreenCoords = vec(x,y)
+                Rects[id].ScreenSize = (entry.width / screenWidth) * scale
             end
         end
 
-        local dist = #(ClientCamCoords.xy - vector2(entry.x, entry.y))
-        local scale = calculateScale(dist, 25, 100, 0.16666, 1.0)
-        local onscreen,  x, y = GetScreenCoordFromWorldCoord(entry.x, entry.y, entry.z)
-        if onscreen then
-            DrawRect(x , y , (entry.width / screenWidth) * scale, (entry.height / screenHeight) * scale, lineColors[rectType])
-            Rects[entry.id].ScreenCoords = vec(x,y)
-            Rects[entry.id].ScreenSize = (entry.width / screenWidth) * scale
+    else
+        for key, entry in pairs(rectsToDraw) do
+
+            local id = entry.id
+            local rectCache = secondFrameRectCache[id]
+
+            if rectCache.onscreen then
+                
+                local rectType = entry.rectType
+                if entry.parentLine ~= CurrentlySelectedPropLine then
+                    rectType = Enum.LineDrawType.UNSELECTED
+                else
+                    if currentlyEditing then
+                        if entry.parentPoint == CurrentHeadOfLine then
+                            rectType = Enum.LineDrawType.EDITHEAD
+                        end 
+                        if EditSelection == entry.parentPoint then
+                            
+                            rectType = Enum.LineDrawType.EDITSELECT
+                        end
+                    end
+                end
+                
+                DrawRect(rectCache.x , rectCache.y , (entry.width / screenWidth) * rectCache.scale, (entry.height / screenHeight) * rectCache.scale, lineColors[rectType])
+
+            end
+
         end
     end
+
+    
+    
+    
 end
 
 
@@ -215,7 +265,6 @@ local function drawDistances()
         ClearDrawOrigin()
     end
 end
-
 function Render()
     aspectRatio = GetAspectRatio(false) -- ? try switching to true
     screenWidth, screenHeight = GetActualScreenResolution()
@@ -229,6 +278,8 @@ function Render()
     drawPreviews()
     draw2dElements()
     drawDistances()
+
+    secondFrame = not secondFrame
 
 end
 -- CreateThread(function (threadId)
@@ -277,6 +328,7 @@ function AddRect(pos, rectType, parentLine, parentPoint)
         parentPoint = parentPoint,
     }
     Rects[id] = newRect
+    secondFrameRectCache[id] = {}
     -- print("AddRect", "id", id)
     return id
 end
@@ -311,3 +363,137 @@ function SetPreview(mode)
 end
 
 -- TODO: Add Parent lines for unselect effect
+
+
+-- local profile_rectsToDraw = {}
+-- local cache = {}
+
+-- local function createRandomRects(n)
+--     for i = 1, n, 1 do
+--         profile_rectsToDraw[i] = {
+--             id = i,
+--             rectType = 1,
+--             parentLine = -1,
+--             parentPoint = i,
+--             x = math.random(0.0,1000.0),
+--             y = math.random(00.0,1000.0),
+--             z = math.random(00.0,1000.0),
+--             width = 32,
+--             height = 32,
+--         }
+--         cache[i] = {}
+--     end
+-- end
+-- createRandomRects(1000)
+
+-- local LocalClientCamCoords = vector3(0.0,-1000.0,0.0)
+-- local LOCAL_screenHeight = 1080
+-- local LOCAL_screenWidth = 1920
+
+-- local secondFrame = false
+-- local lDrawRect = DrawRect
+-- local lGetScreenCoords = GetScreenCoordFromWorldCoord
+
+-- local function drawRects_profilefunc()
+
+--     local currentlyEditing = true
+
+--     if secondFrame then
+--         for key, entry in pairs(profile_rectsToDraw) do
+
+
+
+--             local rectCache = cache[key]
+--             if rectCache.onscreen then
+
+--                 local rectType = entry.rectType
+--                 if entry.parentLine ~= CurrentlySelectedPropLine then
+--                     rectType = Enum.LineDrawType.UNSELECTED
+--                 else
+--                     if currentlyEditing then
+--                         if entry.parentPoint == CurrentHeadOfLine then
+--                             rectType = Enum.LineDrawType.EDITHEAD
+--                         end 
+--                         if EditSelection == entry.parentPoint then
+                            
+--                             rectType = Enum.LineDrawType.EDITSELECT
+--                         end
+--                     end
+--                 end
+--                 DrawRect(rectCache.x , rectCache.y , (entry.width / LOCAL_screenWidth) * rectCache.scale, (entry.height / LOCAL_screenHeight) * rectCache.scale, lineColors[rectType])
+--                 -- Rects[entry.id].ScreenCoords = vec(x,y)
+--                 -- Rects[entry.id].ScreenSize = (entry.width / LOCAL_screenWidth) * scale
+--             end
+--         end
+--     else
+--         local countOnScreen = 0
+--         for key, entry in pairs(profile_rectsToDraw) do
+
+
+
+--             local dist = #(LocalClientCamCoords.xy - vector2(entry.x, entry.y))
+--             local scale = calculateScale(dist, 25, 100, 0.16666, 1.0)
+--             local onscreen,  x, y = GetScreenCoordFromWorldCoord(entry.x + 0.5, entry.y + 0.5, entry.z + 0.5)
+
+--             -- print(x, y, entry.x, entry.y, entry.z)
+
+--             cache[key].scale = scale
+--             cache[key].onscreen = onscreen
+--             cache[key].x = x
+--             cache[key].y = y
+
+--             if onscreen then
+
+--                 countOnScreen = countOnScreen + 1
+
+--                 local rectType = entry.rectType
+--                 if entry.parentLine ~= CurrentlySelectedPropLine then
+--                     rectType = Enum.LineDrawType.UNSELECTED
+--                 else
+--                     if currentlyEditing then
+--                         if entry.parentPoint == CurrentHeadOfLine then
+--                             rectType = Enum.LineDrawType.EDITHEAD
+--                         end 
+--                         if EditSelection == entry.parentPoint then
+                            
+--                             rectType = Enum.LineDrawType.EDITSELECT
+--                         end
+--                     end
+--                 end
+--                 DrawRect(x , y , (entry.width / LOCAL_screenWidth) * scale, (entry.height / LOCAL_screenHeight) * scale, lineColors[rectType])
+--                 -- Rects[entry.id].ScreenCoords = vec(x,y)
+--                 -- Rects[entry.id].ScreenSize = (entry.width / LOCAL_screenWidth) * scale
+--             end
+--         end
+--         print(countOnScreen)
+--     end
+
+--     secondFrame = not secondFrame
+-- end
+
+-- local function profile_rectDraw()
+--     Wait(0)
+--     local start = GetGameTimer()
+--     for i = 1, 10000, 1 do
+--         drawRects_profilefunc()
+--     end
+--     local end1 = GetGameTimer()
+--     Wait(0)
+--     local end2 = GetGameTimer()
+--     return end1 - start, end2 - start
+
+-- end
+
+-- local function profilethread_rectDraw()
+--     for i = 1, 2000, 1 do
+--         drawRects_profilefunc()
+--         Wait(0)
+--     end
+
+-- end
+
+-- RegisterCommand("profile_rectDraw", function ()
+
+--     profilethread_rectDraw()
+--     print("Done")
+-- end)
