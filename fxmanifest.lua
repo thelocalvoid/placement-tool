@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 
 author 'clook'
-version 'v1.3.51'
+version 'v1.3.71 Added UI Elements'
 
 shared_scripts {
     'config.lua',
