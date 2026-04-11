@@ -762,7 +762,6 @@ local ControlThreadFunction = function ()
     startDevWeather()
     
     while controlThreadSwitch == 1 do
-        setDevWeatherThisFrame()
         -- usingController = (IsUsingKeyboard(0) == false)
 
         DisableAllControlActions(Enum.PadType.PLAYER_CONTROL)
@@ -797,6 +796,7 @@ local ControlThreadFunction = function ()
         -- else
         CurrentCameraControlFunction(GetFrameTime())
         Render()
+        setDevWeatherThisFrame()
 
         -- print("control-handler.lua",ClientCamCoords)
         -- end
