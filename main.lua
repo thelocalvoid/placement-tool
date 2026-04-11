@@ -82,6 +82,12 @@ CurrentHeadOfLine = -1
 EditSelection = -1
 PropLines = {}
 
+PropLineCount = 0
+PropPointCount = 0
+PropGridCount = 0
+PropLinePointCount = 0
+PropLineGridCount = 0
+
 MoveReturnPos = vector3(0.0,0.0,0.0)
 MoveReturnNormal = vector3(0.0,0.0,0.0)
 RotateReturnWasntOverridden = true

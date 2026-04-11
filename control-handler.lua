@@ -360,10 +360,6 @@ local toolStateControls = {
 
             switchToolState(Enum.ToolStates.SUBDIVIDE, {}, {})
             
-        elseif IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.T) then -- Exit Build Mode
-
-            switchToolState(Enum.ToolStates.EDIT, {}, {})
-            
         elseif IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.G) then
 
             switchToolState(Enum.ToolStates.MOVE, {}, {})
@@ -532,12 +528,8 @@ local toolStateControls = {
                 end
             end
         
-
-            if IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.V) then
-
-                switchToolState(Enum.ToolStates.EDIT, {}, {})
                 
-            elseif IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.ESC) then
+            if IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.ESC) then
 
                 switchToolState(Enum.ToolStates.EDIT, {}, {})
                 
@@ -593,10 +585,6 @@ local toolStateControls = {
         end
         if IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.ESC) then
             -- print("Escape Pressed")
-            switchToolState(Enum.ToolStates.EDIT, {}, {})
-
-        elseif IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.R) then
-            
             switchToolState(Enum.ToolStates.EDIT, {}, {})
 
         elseif IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.V) then
@@ -701,10 +689,6 @@ local toolStateControls = {
                 SetPreview(Enum.PreviewModes.NONE)
                 SetMouseCursorStyle(Enum.MousePointerStyle.ARROW)
             end
-
-        elseif IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.H) then
-
-            switchToolState(Enum.ToolStates.EDIT, {}, {})
 
         elseif IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.R) then
 

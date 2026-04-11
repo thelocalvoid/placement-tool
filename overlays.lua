@@ -227,9 +227,140 @@ local function drawControls()
     end
 end
 
+local statDrawFunctions = {
+    [0] = function ()
+        local originX =  0.1
+        local originY =  0.1
+        local verticalOffsetPerLine = 0.015
+        local scale = 0.25
+
+        BeginTextCommandDisplayText('YmapTotLines')
+        AddTextComponentInteger(PropLineCount)
+        SetTextScale(scale, scale)
+        EndTextCommandDisplayText(originX, originY)
+
+        BeginTextCommandDisplayText('YmapTotPoints')
+        AddTextComponentInteger(PropPointCount)
+        SetTextScale(scale, scale)
+        EndTextCommandDisplayText(originX, originY + verticalOffsetPerLine)
+
+        -- BeginTextCommandDisplayText('YmapTotGrids')
+        -- AddTextComponentInteger(PropGridCount)
+        -- SetTextScale(scale, scale)
+        -- EndTextCommandDisplayText(originX, originY + (verticalOffsetPerLine*2))
+
+    end,
+    [2] = function ()
+        local colour = vector4(255, 255, 255, 255)
+
+        local originX =  0.1
+        local originY =  0.1
+        local verticalOffsetPerLine = 0.015
+        local scale = 0.25
+
+        local Line = PropLines[CurrentlySelectedPropLine]
+
+
+        BeginTextCommandDisplayText('YmapTotLines')
+        AddTextComponentInteger(PropLineCount)
+        SetTextScale(scale, scale)
+        EndTextCommandDisplayText(originX, originY)
+
+        BeginTextCommandDisplayText('YmapPointsInSelect')
+        AddTextComponentInteger(Line.pointCount)
+        AddTextComponentInteger(PropPointCount)
+        SetTextScale(scale, scale)
+        EndTextCommandDisplayText(originX, originY + verticalOffsetPerLine)
+
+        -- BeginTextCommandDisplayText('YmapGridsInSelect')
+        -- AddTextComponentInteger(PropLineGridCount)
+        -- AddTextComponentInteger(PropGridCount)
+        -- SetTextScale(scale, scale)
+        -- EndTextCommandDisplayText(originX, originY + (verticalOffsetPerLine*2))
+
+        BeginTextCommandDisplayText('YmapCurrLine')
+        AddTextComponentInteger(CurrentlySelectedPropLine)
+        SetTextScale(scale, scale)
+        EndTextCommandDisplayText(originX, originY + (verticalOffsetPerLine*4)) -- Add 1 for gap
+
+        if EditSelection ~= -1 then
+            BeginTextCommandDisplayText('YmapCurrPoint')
+            AddTextComponentInteger(EditSelection)
+            SetTextScale(scale, scale)
+            EndTextCommandDisplayText(originX, originY + (verticalOffsetPerLine*5))
+        end
+
+        
+
+        BeginTextCommandDisplayText('YmapLineRandomRot')
+        AddTextComponentSubstringPlayerName(tostring(Line.randomRotationZ))
+        SetTextScale(scale, scale)
+        if Line.randomRotationZ then
+            SetTextColour(50, 200, 50, 255)
+        else
+            SetTextColour(175, 175, 50, 255)
+        end
+        EndTextCommandDisplayText(0.45, 0.875)
+
+        BeginTextCommandDisplayText('YmapLineReverse')
+        AddTextComponentSubstringPlayerName(tostring(Line.reverse))
+        SetTextScale(scale, scale)
+        SetTextColour(50, 200, 50, 255)
+        if Line.randomRotationZ then
+            SetTextColour(150, 150, 150, 150)
+        else
+            if Line.reverse then
+                SetTextColour(50, 200, 50, 255)
+            else
+                SetTextColour(175, 175, 50, 255)
+            end
+        end
+        EndTextCommandDisplayText(0.45, 0.875 + verticalOffsetPerLine)
+
+        BeginTextCommandDisplayText('YmapLineRotOffset')
+        AddTextComponentInteger(Line.offsetToRotationZ)
+        SetTextScale(scale, scale)
+        if Line.randomRotationZ then
+            SetTextColour(150, 150, 150, 150)
+        else
+            SetTextColour(255, 255, 255, 255)
+        end
+        EndTextCommandDisplayText(0.45, 0.875 + verticalOffsetPerLine*2)
+
+        BeginTextCommandDisplayText('YmapLineAlignNorm')
+        AddTextComponentSubstringPlayerName(tostring(Line.alignToGroundNormal))
+        SetTextScale(scale, scale)
+        if Line.alignToGroundNormal then
+            SetTextColour(50, 200, 50, 255)
+        else
+            SetTextColour(175, 175, 50, 255)
+        end
+        EndTextCommandDisplayText(0.45, 0.875 + verticalOffsetPerLine*3)
+
+        BeginTextCommandDisplayText('YmapLineVertOffset')
+        AddTextComponentInteger(Line.verticalOffset)
+        SetTextScale(scale, scale)
+        EndTextCommandDisplayText(0.45, 0.875 + verticalOffsetPerLine*4)
+        
+        BeginTextCommandDisplayText('YmapLineWobble')
+        AddTextComponentInteger(Line.maxWobbleDegrees)
+        SetTextScale(scale, scale)
+        EndTextCommandDisplayText(0.45, 0.875 + verticalOffsetPerLine*5)
+
+
+
+    end,
+
+}
+
+local function drawStats()
+    statDrawFunctions[CurrentlySelectedPropLine / math.abs(CurrentlySelectedPropLine)+1]()
+end
+
 local function draw2dElements()
     drawCurrentToolState()
     -- drawTooltip()
+    drawStats()
     drawControls()
 end
 

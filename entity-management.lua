@@ -57,6 +57,8 @@ local function createNewPoint(id, parentLineId, position, pointGroundNormal, you
     local zVar = ((seededRandom(seed*5) * 2) - 1)
     point.PosAndRotData.rotationVariation = vector3(xVar, 0.0, zVar)
 
+    PropPointCount = PropPointCount + 1
+
     return point
 end
 
@@ -69,7 +71,7 @@ local function createNewLine(entityName, firstPos)
         propName = entityName,
         reverse = false,
         randomRotationZ = false,
-        alignToGroundNormal = false, -- TODO: This now functions properly, i need to make a command to toggle
+        alignToGroundNormal = false,
         offsetToRotationZ = 0,
         verticalOffset = 0,
         headOfLine = 1,
@@ -82,6 +84,7 @@ local function createNewLine(entityName, firstPos)
     -- Set current selected line
     CurrentlySelectedPropLine = id
     CurrentHeadOfLine = 1
+    PropLineCount = PropLineCount + 1
 
     return newLine, id
     -- AddRect(firstPos)
@@ -699,7 +702,8 @@ function RemovePoint(lineId, pointId)
         PropLines[lineId].headOfLine = youngerId
     end
 
-    
+    PropPointCount = PropPointCount - 1
+    line.pointCount = line.pointCount - 1
     
 end
 
@@ -716,8 +720,11 @@ function RemoveLine(lineId)
         if value.lineId then
             Lines[value.lineId] = nil
         end
+        line.pointCount = line.pointCount - 1
+        PropPointCount = PropPointCount - 1
     end
 
+    PropLineCount = PropLineCount - 1
     PropLines[lineId] = nil
 end
 
