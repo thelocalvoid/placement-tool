@@ -541,6 +541,10 @@ local toolStateControls = {
 
                 switchToolState(Enum.ToolStates.DELETE, {}, {})
                 
+            elseif IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.H) then
+
+                switchToolState(Enum.ToolStates.ROTATION_OVERRIDE, {}, {})
+                
             elseif IsDisabledControlJustPressed(Enum.PadType.PLAYER_CONTROL, Enum.CameraControlKeys.G) then
 
                 switchToolState(Enum.ToolStates.MOVE, {}, {})

@@ -64,12 +64,13 @@ HudElements = {
             local list = {}
             list[1] = ""
             list[2] = strings.control_switchto_escape
-            list[3] = strings.control_switchto_grab
-            list[4] = strings.control_switchto_remove
-            list[5] = strings.control_switchto_subdivide
-            list[6] = strings.control_switchto_heading
-            list[7] = ""
-            list[8] = strings.control_create_point
+            list[3] = "~h~"..strings.control_switchto_build
+            list[4] = strings.control_switchto_grab
+            list[5] = strings.control_switchto_remove
+            list[6] = strings.control_switchto_subdivide
+            list[7] = strings.control_switchto_heading
+            list[8] = ""
+            list[9] = strings.control_create_point
             return list
         end,
         [Enum.ToolStates.MOVE] = function ()
@@ -77,12 +78,13 @@ HudElements = {
             list[1] = ""
             list[2] = strings.control_switchto_escape
             list[3] = strings.control_switchto_build
-            list[4] = strings.control_switchto_remove
-            list[5] = strings.control_switchto_subdivide
-            list[6] = strings.control_switchto_heading
-            list[7] = ""
-            list[8] = strings.control_drag_point
-            list[9] = strings.control_cancel
+            list[4] = "~h~"..strings.control_switchto_grab
+            list[5] = strings.control_switchto_remove
+            list[6] = strings.control_switchto_subdivide
+            list[7] = strings.control_switchto_heading
+            list[8] = ""
+            list[9] = strings.control_drag_point
+            list[10] = strings.control_cancel
             return list
         end,
         [Enum.ToolStates.DELETE] = function ()
@@ -91,10 +93,11 @@ HudElements = {
             list[2] = strings.control_switchto_escape
             list[3] = strings.control_switchto_build
             list[4] = strings.control_switchto_grab
-            list[5] = strings.control_switchto_subdivide
-            list[6] = strings.control_switchto_heading
-            list[7] = ""
-            list[8] = strings.control_delete_point
+            list[5] = "~h~"..strings.control_switchto_remove
+            list[6] = strings.control_switchto_subdivide
+            list[7] = strings.control_switchto_heading
+            list[8] = ""
+            list[9] = strings.control_delete_point
             return list
         end,
         [Enum.ToolStates.SUBDIVIDE] = function ()
@@ -104,9 +107,10 @@ HudElements = {
             list[3] = strings.control_switchto_build
             list[4] = strings.control_switchto_grab
             list[5] = strings.control_switchto_remove
-            list[6] = strings.control_switchto_heading
-            list[7] = ""
-            list[8] = strings.control_create_point
+            list[6] = "~h~"..strings.control_switchto_subdivide
+            list[7] = strings.control_switchto_heading
+            list[8] = ""
+            list[9] = strings.control_create_point
             return list
         end,
         [Enum.ToolStates.ROTATION_OVERRIDE] = function ()
@@ -117,10 +121,11 @@ HudElements = {
             list[4] = strings.control_switchto_grab
             list[5] = strings.control_switchto_remove
             list[6] = strings.control_switchto_subdivide
-            list[7] = ""
-            list[8] = strings.control_rotate_point
-            list[9] = strings.control_remove_heading
-            list[10] = strings.control_cancel
+            list[7] = "~h~"..strings.control_switchto_heading
+            list[8] = ""
+            list[9] = strings.control_rotate_point
+            list[10] = strings.control_remove_heading
+            list[11] = strings.control_cancel
             return list
         end,
     },
