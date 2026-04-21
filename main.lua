@@ -93,6 +93,15 @@ MoveReturnNormal = vector3(0.0,0.0,0.0)
 RotateReturnWasntOverridden = true
 RotateReturnDir = vector3(0.0,0.0,0.0)
 
+--* Data retrieval
+
+---@param id integer
+---@return object propline
+function GetProplineFromId(id)
+    if PropLines[id] then return PropLines[id] end
+end
+
+
 
 -- * ////////////// PERM VERIFICATION //////////////
 local PENDING_CHECK = false

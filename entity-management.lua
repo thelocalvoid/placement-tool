@@ -213,16 +213,16 @@ end
 
 local function applyRotationVariation(originalF, F, R, U, rotationVariation, maxWobbleDegrees)
     
-    local degFU = rotationVariation.x * maxWobbleDegrees
-    local degRF = rotationVariation.z * 360
     if maxWobbleDegrees ~= 0 then
+        local degFU = rotationVariation.x * maxWobbleDegrees
+        local degRF = rotationVariation.z * 360
         U = rotateU_onPlanes(F, R, U, degFU, degRF)
 
         F = cm_Norm_vec3(originalF)
         U = cm_Norm_vec3(U)
         R = cm_Norm_vec3(cm_Cross_vec3(F, U))
         -- re-orthoganise
-        F = cm_Cross_vec3(U, R)
+        F = cm_Norm_vec3(cm_Cross_vec3(U, R))
     end
 
     return F, R, U
@@ -331,7 +331,7 @@ end
 
 function CompilePositionAndRotation(point)
 
-    local line = PropLines[point.parentId]
+    local line = GetProplineFromId(point.parentId)
     local data = point.PosAndRotData
     
     local vertOffset = line.alignToGroundNormal and data.pointGroundNormal * line.verticalOffset or vector3(0.0,0.0,1.0) * line.verticalOffset
@@ -340,7 +340,7 @@ function CompilePositionAndRotation(point)
     local propQuaternion = vector4(0.0,1.0,0.0,1.0)
 
     local originalU = line.alignToGroundNormal and data.pointGroundNormal or vector(0.0,0.0,1.0)
-    local originalF = data.baseLineHeadingDir -- vector3(data.baseLineHeadingDir.x,data.baseLineHeadingDir.y,0.0)
+    local originalF = (data.headingOverride == true) and data.headingOverrideDir or data.baseLineHeadingDir -- vector3(data.baseLineHeadingDir.x,data.baseLineHeadingDir.y,0.0)
 
     -- local startDiff = propPosition - ClientCamCoords
     -- local endDiff = propPosition + originalF - ClientCamCoords
@@ -352,8 +352,8 @@ function CompilePositionAndRotation(point)
 
     -- print(F, R, U)
 
-    F = cm_Norm_vec3(originalF)
-    U = cm_Norm_vec3(originalU)
+    local F = cm_Norm_vec3(originalF)
+    local U = cm_Norm_vec3(originalU)
     R = cm_Cross_vec3(F, U)
     
     R = cm_Norm_vec3(R)
@@ -376,20 +376,20 @@ function CompilePositionAndRotation(point)
     
     -- print(currentMatrix.F, currentMatrix.R, currentMatrix.U)
 
-    if data.headingOverride then
+    -- if data.headingOverride then
         
-        F = data.headingOverrideDir -- vector3(data.headingOverrideDir.x, data.headingOverrideDir.y, 0.0)
+    --     F = data.headingOverrideDir -- vector3(data.headingOverrideDir.x, data.headingOverrideDir.y, 0.0)
 
 
-        F = cm_Norm_vec3(F)
-        U = cm_Norm_vec3(originalU)
-        R = cm_Cross_vec3(F, U)
+    --     F = cm_Norm_vec3(F)
+    --     U = cm_Norm_vec3(originalU)
+    --     R = cm_Cross_vec3(F, U)
         
-        R = cm_Norm_vec3(R)
-        -- re-orthoganise
-        F = cm_Norm_vec3(cm_Cross_vec3(U, R))
+    --     R = cm_Norm_vec3(R)
+    --     -- re-orthoganise
+    --     F = cm_Norm_vec3(cm_Cross_vec3(U, R))
 
-    elseif line.randomRotationZ then
+    if line.randomRotationZ then
         local degs = data.rotationVariation.z * 7868
         F, R, U = rotateFRU_inFRPlane(F, R, U, degs)
 
@@ -406,7 +406,7 @@ function CompilePositionAndRotation(point)
     U = cm_Norm_vec3(U)
     R = cm_Norm_vec3(cm_Cross_vec3(F, U))
     -- re-orthoganise
-    F = cm_Cross_vec3(U, R)
+    F = cm_Norm_vec3(cm_Cross_vec3(U, R))
 
     -- print(currentMatrix.F)
     -- print(currentMatrix.R)
