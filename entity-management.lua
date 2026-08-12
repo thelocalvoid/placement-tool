@@ -395,7 +395,7 @@ function CompilePositionAndRotation(point)
 
         -- TODO: Make this not relative to base heading
 
-    else
+    elseif (data.headingOverride == false) then
         F, R, U = rotateFRU_inFRPlane(F, R, U, line.offsetToRotationZ)
     end
 

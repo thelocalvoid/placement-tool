@@ -660,13 +660,13 @@ end
 
 --* ////////////// HANDLES LOCAL EVENTS FROM MAIN.LUA //////////////
 --* Mostly function calls
+---@diagnostic disable-next-line: redundant-parameter
 RegisterNetEvent("postplace-kjghKJHGgasd:func", function (data)
     local action = data.action
     if not DoesClientHavePerms() then
         return
     end
     if ToolEnabled then
-        
         if action == "ppt_2dmap" then
             SetCameraState(Enum.ClientCameraStates.MAP2D)
         elseif action == "ppt_3dmap" then
