@@ -18,7 +18,7 @@ So I put some time into this tool to save us alot of time and pain. I also put s
 
 Thankfully, it was all worth the effort!
 
-We we're able to complete long stretches of roads in under 10 minutes (Guide posts on both sides, every 10-30m).
+We we're able to complete long stretches of roads in under 10 minutes (Guide posts on both sides, every 10-30 meters).
 
 ## Features of the tool
 
