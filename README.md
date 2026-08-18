@@ -1,12 +1,12 @@
 # Object Placement Tool
 
-This tool was originally created to streamline the process of placing a large amount of guideposts along all of the roads in GTA 5.
+This tool was originally created to streamline the process of placing a large amount of [guideposts](https://www.delnorth.com.au/products/guideposts/) along all of the roads in GTA 5.
 
-The alternative method was using codewalker - A great application, but wasn't design for this sort of task. In order to place all the guideposts it would be very tedious, time consuming and repetitive.
+The alternative method was using [codewalker](https://github.com/dexyfex/CodeWalker) - A great application, but wasn't design for this sort of task. In order to place all the guideposts it would be very tedious, time consuming and repetitive.
 
 Our team didn't have much time - and I personally wasn't keen on us all getting carpal tunnel or RSI 😅
 
-So I put some time into this tool to save us all the time and pain. I put some extra effort into UX:
+So I put some time into this tool to save us all the time and pain. I also put some extra effort into UX:
 - **A contextual cursor** - Changes based on mode and validity of the action being attempted.
 - **Custom Camera System** - It utilizes a custom camera system I made, modified for specific needs of the tool. (3 Camera modes included)
 - **Controls UI** - Shows controls and updates based on the current mode you are in.
