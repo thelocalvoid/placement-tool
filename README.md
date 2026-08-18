@@ -19,6 +19,8 @@ Thankfully, it was all worth the effort!
 ## Features of the tool
 
 - **Quick object placement**
+- **Prop-terrain alignment** - An option to snap the rotation of the prop to the ground beneath it.
+- **Random Rotation** - Some random, seed based rotation options to add variety to each object instance.
 - **Automatic Heading Calculation** (Useful for the guideposts as the rotate with the road)
 - **Live preview** - Immediately see the prop in the game itself, no restart required.
 - **Export to YMAP** (Only configured for our guideposts, but easily changeable)
