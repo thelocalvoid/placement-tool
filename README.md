@@ -1,5 +1,7 @@
 # Object Placement Tool
 
+*Files provided are not to be used, just a showcase.*
+
 This tool was originally created to streamline the process of placing a large amount of [guideposts](https://www.delnorth.com.au/products/guideposts/) along all of the roads in GTA 5.
 
 The alternative method was using [codewalker](https://github.com/dexyfex/CodeWalker) - A great application, but wasn't design for this sort of task. In order to place all the guideposts it would be very tedious, time consuming and repetitive.
