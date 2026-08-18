@@ -69,3 +69,37 @@ Easy clean up when your done!
 
 https://github.com/user-attachments/assets/8413ce29-ce07-44c6-99ae-50c912535e25
 
+## Additional options
+
+### Automatic Heading Calculation
+
+Street signs are a great example.
+Notice they rotate based on the position of their neighbours
+
+https://github.com/user-attachments/assets/49ffa034-3e55-4bc9-b384-3d02b9147266
+
+https://github.com/user-attachments/assets/995824c7-937e-40f2-870a-3c59caeb2aa0
+
+### Random Rotation
+
+Okay, maybe street signs aren't a great example for this, but could be great for more organic objects
+
+https://github.com/user-attachments/assets/86594440-09e5-407b-ac93-b38f72fedf2d
+
+### Reverse Rotation
+
+Great for if you accidently build the line in the wrong direction 😅
+
+https://github.com/user-attachments/assets/04651b86-07e2-4c30-bd3f-cdad2cc34de8
+
+### Random Wobble
+
+Each object has a wobble direction based on it's seed.
+
+You can change the intensity of the wobble:
+
+https://github.com/user-attachments/assets/ac3ea6d2-f297-4cab-ae4b-75376df83749
+
+
+
+
