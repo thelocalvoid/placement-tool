@@ -18,6 +18,7 @@ So I put some time into this tool to save us alot of time and pain. I also put s
 - **Minimizing Text Commands** - Text commands are slow, finding alternate methods to speed things up.
 - **Visual Assistance** - When you open the tool, it changes the time to night, removes fog, removes clouds, and adds a few extra things to make the overlays easier to see.
 
+## It helped alot
 
 Thankfully, it was all worth the effort!
 
