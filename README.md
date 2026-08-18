@@ -49,6 +49,8 @@ https://github.com/user-attachments/assets/1fde533a-0144-441d-9666-ebc84df86b8b
 
 ### Move points
 
+Easy to adjust positions in two clicks.
+
 https://github.com/user-attachments/assets/9a7a301f-4a98-41c2-a25c-2d98ecf5c3ec
 
 ### Add points between other points
