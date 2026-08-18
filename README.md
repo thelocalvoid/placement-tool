@@ -8,7 +8,7 @@ Our team didn't have much time - and I personally wasn't keen on us all getting 
 
 ### We needed a faster solution
 
-So I put some time into this tool to save us all the time and pain. I also put some extra effort into UX:
+So I put some time into this tool to save us alot of time and pain. I also put some extra effort into UX:
 - **A contextual cursor** - Changes based on mode and validity of the action being attempted.
 - **Custom Camera System** - It utilizes a custom camera system I made, modified for specific needs of the tool. (2 Camera modes included: 3D mode, 2D Map view)
 - **Controls UI** - Shows controls and updates based on the current mode you are in.
