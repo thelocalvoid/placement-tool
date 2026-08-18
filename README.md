@@ -16,6 +16,7 @@ So I put some time into this tool to save us alot of time and pain. I also put s
 - **Controls UI** - Shows controls and updates based on the current mode you are in.
 - **Refining controls** - Testing control schemes and working out what works best and felt natural.
 - **Minimizing Text Commands** - Text commands are slow, finding alternate methods to speed things up.
+- **Visual Assistance** - When you open the tool, it changes the time to night, removes fog, removes clouds, and adds a few extra things to make the overlays easier to see.
 
 
 Thankfully, it was all worth the effort!
