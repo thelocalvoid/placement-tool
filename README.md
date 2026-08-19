@@ -67,7 +67,7 @@ https://github.com/user-attachments/assets/745acf5e-31c0-4668-9d96-89ce61314370
 
 ### Rotate point
 
-In our example, this bollard was rotated 45 degrees, because of the automatic heading calculations and way the neighbours are positioned.
+In our example, this bollard *was* rotated 45 degrees - because of the automatic heading calculations and way the neighbours are positioned.
 
 We don't like that, so we are going to override its heading - to make it more square like the others
 
