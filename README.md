@@ -4,25 +4,28 @@
 
 This tool was originally created to streamline the process of placing a large amount of [guideposts](https://www.delnorth.com.au/products/guideposts/) along all of the roads in GTA 5.
 
-The alternative method was using [codewalker](https://github.com/dexyfex/CodeWalker) - A great application, but wasn't design for this sort of task. In order to place all the guideposts it would be very tedious, time consuming and repetitive.
+The alternative method was using [codewalker](https://github.com/dexyfex/CodeWalker) - A great application, but isn't designed for this sort of task. In order to place all the guideposts using codewalker, it would be very tedious, time consuming and repetitive.🥱
 
-Our team didn't have much time - and I personally wasn't keen on us all getting carpal tunnel or RSI 😅
 
-### We needed a faster solution
+### ⏰ We needed a faster solution
 
-So I put some time into this tool to save us alot of time and pain. I also put some extra effort into UX:
-- **A contextual cursor** - Changes based on mode and validity of the action being attempted.
-- **Custom Camera System** - It utilizes a custom camera system I made, modified for specific needs of the tool. (2 Camera modes included: 3D mode, 2D Map view)
-- **Controls UI** - Shows controls and updates based on the current mode you are in.
-- **Refining controls** - Testing control schemes and working out what works best and felt natural.
-- **Minimizing Text Commands** - Text commands are slow, finding alternate methods to speed things up.
-- **Visual Assistance** - When you open the tool, it changes the time to night, removes fog, removes clouds, and adds a few extra things to make the overlays easier to see.
+Our team didn't have much time - and I personally wasn't keen on the team getting carpal tunnel or RSI, before the task was even finished😅
+So I put some time into this tool to save us all that time and pain. 
 
-### It helped alot
+I also put some extra effort into the UX, which included:
+- ✔**A contextual cursor** - Changes based on the mode and validity of the action being attempted, which gives the dev feedback and a sense of what action they are doing - without having to look away and read.
+- ✔**Custom Camera System** - Utilising a custom camera system I made - modified for specific needs of the tool. (2 modes included: 3D view, 2D map view)
+- ✔**Controls UI** - Shows what buttons to press depending on the mode you are currently in.
+- ✔**Refining controls** - Lots of testing different control schemes, and working out what works best and felt natural.
+- ✔**Minimizing Text Commands** - Text commands are slow, finding alternate methods to speed things up. Keybinds where possible.
+- ✔**Visual Assistance** - When you open the tool, it changes the in-game time to night, removes fog, removes clouds, and adds a few extra things to make the tool overlays easier to see.
 
-Thankfully, it was all worth the effort!
+### ✅ It helped alot 
 
-We we're able to complete long stretches of roads in under 10 minutes (Guide posts on both sides, every 10-30 meters).
+It was all worth the effort! 
+
+We we're able to complete long stretches of roads in under 10 minutes (Guide posts on both sides, every 10-30 meters) 💯
+
 
 ## Features of the tool
 
